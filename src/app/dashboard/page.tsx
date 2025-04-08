@@ -54,7 +54,7 @@ export default function Dashboard() {
       {/* Sidebar */}
       <div className="hidden md:flex w-64 flex-col bg-white border-r">
         <div className="p-4 border-b">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 cursor-default">
             <Cloud className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold">Nuvigo</span>
           </div>
@@ -131,9 +131,8 @@ export default function Dashboard() {
                         className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                       >
                         <div
-                          className={`max-w-[80%] rounded-lg p-3 ${
-                            message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
-                          }`}
+                          className={`max-w-[80%] rounded-lg p-3 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
+                            }`}
                         >
                           {message.content}
                         </div>
@@ -148,7 +147,7 @@ export default function Dashboard() {
                       placeholder="Ask about the weather..."
                       className="flex-1"
                     />
-                    <Button type="submit" size="icon">
+                    <Button type="submit" size="icon" className="cursor-pointer">
                       <Send className="h-4 w-4" />
                     </Button>
                   </form>

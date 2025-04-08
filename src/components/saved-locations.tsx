@@ -2,6 +2,9 @@
 
 import { Button } from "@/components/ui/button"
 import { MapPin, Plus } from "lucide-react"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Dialog, DialogTrigger } from "@/components/ui/dialog"
+import { PlusCircle } from "lucide-react"
 
 interface SavedLocationsProps {
   locations: string[]
@@ -16,7 +19,7 @@ export default function SavedLocations({ locations, activeLocation, onLocationCh
         <Button
           key={location}
           variant={activeLocation === location ? "secondary" : "ghost"}
-          className="w-full justify-start gap-2"
+          className="w-full justify-start gap-2 cursor-pointer"
           onClick={() => onLocationChange(location)}
         >
           <MapPin className="h-4 w-4" />
@@ -24,7 +27,7 @@ export default function SavedLocations({ locations, activeLocation, onLocationCh
         </Button>
       ))}
 
-      <Button variant="ghost" className="w-full justify-start gap-2 text-muted-foreground">
+      <Button variant="ghost" className="w-full justify-start gap-2 text-muted-foreground cursor-pointer">
         <Plus className="h-4 w-4" />
         Add Location
       </Button>

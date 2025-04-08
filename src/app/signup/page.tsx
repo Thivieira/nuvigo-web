@@ -33,7 +33,7 @@ export default function Signup() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" />
+            <Input id="password" type="password" required />
           </div>
           <div className="space-y-2">
             <Label htmlFor="confirmPassword">Confirm Password</Label>
@@ -41,7 +41,7 @@ export default function Signup() {
           </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
-          <Button className="w-full">Create Account</Button>
+          <Button className="w-full cursor-pointer">Create Account</Button>
           <div className="text-center text-sm">
             Already have an account?{" "}
             <Link href="/login" className="text-primary hover:underline">

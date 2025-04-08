@@ -28,11 +28,11 @@ export default function Login() {
                 Forgot password?
               </Link>
             </div>
-            <Input id="password" type="password" />
+            <Input id="password" type="password" required />
           </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
-          <Button className="w-full">Login</Button>
+          <Button className="w-full cursor-pointer">Login</Button>
           <div className="text-center text-sm">
             Don&apos;t have an account?{" "}
             <Link href="/signup" className="text-primary hover:underline">

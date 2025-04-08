@@ -5,18 +5,18 @@ import { ArrowRight, Cloud, Sun, Umbrella } from "lucide-react"
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="border-b">
-        <div className="container flex items-center justify-between py-4">
-          <div className="flex items-center gap-2">
+      <header className="border-b sticky top-0 z-50 bg-background md:static">
+        <div className="container flex items-center justify-between py-4 px-2 mx-auto overflow-x-auto">
+          <div className="flex items-center gap-2 whitespace-nowrap cursor-default">
             <Cloud className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold">Nuvigo</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 whitespace-nowrap">
             <Link href="/login">
-              <Button variant="ghost">Login</Button>
+              <Button variant="ghost" className="cursor-pointer">Login</Button>
             </Link>
             <Link href="/signup">
-              <Button>Sign Up</Button>
+              <Button className="cursor-pointer">Sign Up</Button>
             </Link>
           </div>
         </div>
@@ -32,7 +32,7 @@ export default function Home() {
               Ask about weather in natural language and get AI-powered responses that are helpful and informative.
             </p>
             <Link href="/dashboard">
-              <Button size="lg" className="gap-2">
+              <Button size="lg" className="gap-2 cursor-pointer">
                 Get Started <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
