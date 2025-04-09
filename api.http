@@ -1,0 +1,155 @@
+@baseUrl = http://localhost:3333
+@authToken = your_auth_token_here
+
+### Authentication Endpoints ###
+
+### Register a new user
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "password123"
+}
+
+### Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "john@example.com",
+    "password": "password123"
+}
+
+### Refresh Token
+POST {{baseUrl}}/auth/refresh
+Content-Type: application/json
+
+{
+    "refreshToken": "your_refresh_token_here"
+}
+
+### Logout
+POST {{baseUrl}}/auth/logout
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    "refreshToken": "your_refresh_token_here"
+}
+
+### Verify Email
+POST {{baseUrl}}/auth/verify-email
+Content-Type: application/json
+
+{
+    "token": "your_verification_token_here"
+}
+
+### Forgot Password
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: application/json
+
+{
+    "email": "john@example.com"
+}
+
+### Reset Password
+POST {{baseUrl}}/auth/reset-password
+Content-Type: application/json
+
+{
+    "token": "your_reset_token_here",
+    "password": "new_password123"
+}
+
+### User Management Endpoints ###
+
+### Get all users
+GET {{baseUrl}}/users
+Authorization: Bearer {{authToken}}
+
+### Get user by ID
+GET {{baseUrl}}/users/123e4567-e89b-12d3-a456-426614174000
+Authorization: Bearer {{authToken}}
+
+### Create user
+POST {{baseUrl}}/users
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "password": "password123"
+}
+
+### Update user
+PUT {{baseUrl}}/users/123e4567-e89b-12d3-a456-426614174000
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    "name": "Jane Updated",
+    "email": "jane.updated@example.com"
+}
+
+### Delete user
+DELETE {{baseUrl}}/users/123e4567-e89b-12d3-a456-426614174000
+Authorization: Bearer {{authToken}}
+
+### Weather Endpoints ###
+
+### Get weather information
+GET {{baseUrl}}/weather?location=Rio%20de%20janeiro&query=How%20will%20it%20be%20on%20Friday%20afternoon?&language=en
+Authorization: Bearer {{authToken}}
+
+### Chat Session Endpoints ###
+
+### Get all chat sessions
+GET {{baseUrl}}/chat/sessions
+Authorization: Bearer {{authToken}}
+
+### Get chat session by ID
+GET {{baseUrl}}/chat/sessions/123e4567-e89b-12d3-a456-426614174000
+Authorization: Bearer {{authToken}}
+
+### Delete chat session
+DELETE {{baseUrl}}/chat/sessions/123e4567-e89b-12d3-a456-426614174000
+Authorization: Bearer {{authToken}}
+
+### Chat Message Endpoints ###
+
+### Create chat message
+POST {{baseUrl}}/chat
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    "chatSessionId": "123e4567-e89b-12d3-a456-426614174000",
+    "location": "Rio de Janeiro",
+    "temperature": "25°C",
+    "condition": "Sunny",
+    "naturalResponse": "It's a beautiful sunny day in Rio de Janeiro with a temperature of 25°C."
+}
+
+### Get chat message by ID
+GET {{baseUrl}}/chat/123e4567-e89b-12d3-a456-426614174000
+Authorization: Bearer {{authToken}}
+
+### Update chat message
+PUT {{baseUrl}}/chat/123e4567-e89b-12d3-a456-426614174000
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    "location": "São Paulo",
+    "temperature": "22°C",
+    "condition": "Cloudy",
+    "naturalResponse": "It's a cloudy day in São Paulo with a temperature of 22°C."
+}
+
+### Delete chat message
+DELETE {{baseUrl}}/chat/123e4567-e89b-12d3-a456-426614174000
+Authorization: Bearer {{authToken}} 

@@ -1,6 +1,7 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { ArrowRight, Cloud, Sun, Umbrella } from "lucide-react"
+import { Cloud, Sun, Umbrella } from "lucide-react"
+import AuthButtons from "@/components/AuthButtons"
+import AuthCTAButton from "@/components/AuthCTAButton"
+import { AuthWrapper } from "@/components/AuthWrapper"
 
 export default function Home() {
   return (
@@ -11,14 +12,9 @@ export default function Home() {
             <Cloud className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold">Nuvigo</span>
           </div>
-          <div className="flex items-center gap-4 whitespace-nowrap">
-            <Link href="/login">
-              <Button variant="ghost" className="cursor-pointer">Login</Button>
-            </Link>
-            <Link href="/signup">
-              <Button className="cursor-pointer">Sign Up</Button>
-            </Link>
-          </div>
+          <AuthWrapper>
+            <AuthButtons />
+          </AuthWrapper>
         </div>
       </header>
 
@@ -31,11 +27,9 @@ export default function Home() {
             <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto">
               Ask about weather in natural language and get AI-powered responses that are helpful and informative.
             </p>
-            <Link href="/dashboard">
-              <Button size="lg" className="gap-2 cursor-pointer">
-                Get Started <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
+            <AuthWrapper>
+              <AuthCTAButton />
+            </AuthWrapper>
           </div>
         </section>
 
