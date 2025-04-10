@@ -1,7 +1,7 @@
 import { Cloud, Sun, Umbrella } from "lucide-react"
-import AuthButtons from "@/components/AuthButtons"
-import AuthCTAButton from "@/components/AuthCTAButton"
-import { AuthWrapper } from "@/components/AuthWrapper"
+import AuthButtons from "@/components/auth-buttons"
+import AuthCTAButton from "@/components/auth-cta-button"
+import { AuthWrapper } from "@/components/auth-wrapper"
 
 export default function Home() {
   return (

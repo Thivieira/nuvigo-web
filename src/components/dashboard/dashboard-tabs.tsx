@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { User, History } from "lucide-react"
-import ChatTab from "./ChatTab"
-import HistoryTab from "./HistoryTab"
+import ChatTab from "./chat-tab"
+import HistoryTab from "./history-tab"
 
 interface WeatherData {
   location: string;

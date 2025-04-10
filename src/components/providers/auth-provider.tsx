@@ -1,6 +1,6 @@
 'use client';
 
-import { AuthProvider as ClientAuthProvider } from '@/contexts/AuthContext';
+import { AuthProvider as ClientAuthProvider } from '@/contexts/auth-context';
 import { getCookie } from 'cookies-next';
 import { useEffect, useState } from 'react';
 import { AuthTokens } from '@/types/auth';
@@ -14,12 +14,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         // First try to get from cookie
         const authTokenCookie = getCookie('auth_tokens');
-        
+
         if (authTokenCookie) {
           try {
             const parsedToken = JSON.parse(authTokenCookie.toString());
             console.log('Parsed token:', parsedToken);
-            
+
             // Validate the token structure
             if (parsedToken && parsedToken.accessToken) {
               console.log('Found valid auth token in cookie:', parsedToken);
@@ -34,7 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         } else {
           console.log('No auth token found in cookie, checking localStorage');
-          
+
           // If no cookie, try localStorage (client-side only)
           if (typeof window !== 'undefined') {
             const storedTokens = localStorage.getItem('auth_tokens');
@@ -77,7 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   console.log('Rendering ClientAuthProvider with initialAuthState:', initialAuthState);
-  
+
   return (
     <ClientAuthProvider initialAuthState={initialAuthState}>
       {children}

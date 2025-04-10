@@ -16,10 +16,10 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import SavedLocations from "@/components/saved-locations"
-import { useAuth } from "@/contexts/AuthContext"
+import { useAuth } from "@/contexts/auth-context"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import DashboardTabs from "@/components/dashboard/DashboardTabs"
+import DashboardTabs from "@/components/dashboard/dashboard-tabs"
 
 interface WeatherData {
   location: string;
