@@ -49,7 +49,7 @@ export default function DashboardLayout({
 
   const SidebarContent = () => (
     <>
-      <div className="p-4 border-b">
+      <div className="p-4 border-b" style={{ height: '65px' }}>
         <div className="flex items-center gap-2 cursor-default">
           <Cloud className="h-6 w-6 text-primary" />
           <span className="text-xl font-bold">Nuvigo</span>
@@ -126,7 +126,7 @@ export default function DashboardLayout({
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        <header className="bg-white border-b p-4">
+        <header className="bg-white border-b p-4" style={{ height: '65px' }}>
           <div className="flex items-center justify-between">
             {/* Mobile Menu Button (Left) */}
             <div className="md:hidden">

@@ -49,8 +49,9 @@ export default function DeleteSessionDialog({ sessionId, onConfirm, disabled }: 
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 p-0 hover:bg-destructive hover:text-destructive-foreground"
+          className="h-8 w-8 p-0 hover:bg-destructive hover:text-destructive-foreground cursor-pointer"
           disabled={disabled}
+          title="Excluir Conversa"
         >
           <Trash2 className="h-4 w-4" />
         </Button>
@@ -67,6 +68,7 @@ export default function DeleteSessionDialog({ sessionId, onConfirm, disabled }: 
             variant="outline"
             onClick={() => setOpen(false)}
             disabled={isDeleting}
+            className="cursor-pointer"
           >
             Cancelar
           </Button>
@@ -74,6 +76,7 @@ export default function DeleteSessionDialog({ sessionId, onConfirm, disabled }: 
             variant="destructive"
             onClick={handleDelete}
             disabled={isDeleting}
+            className="cursor-pointer"
           >
             {isDeleting ? "Excluindo..." : "Excluir"}
           </Button>

@@ -25,10 +25,10 @@ export default function HistoryItem({ id, title, location, createdAt, onDelete }
   return (
     <Card
       className="p-4 hover:bg-slate-50 cursor-pointer transition-colors"
-      onClick={handleClick}
+
     >
       <div className="flex items-start justify-between">
-        <div className="space-y-1">
+        <div className="space-y-1" onClick={handleClick} title={`Abrir conversa "${title}"`}>
           <h3 className="font-medium">{title}</h3>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span>{location}</span>
