@@ -6,8 +6,8 @@ import { ClientProviders } from '@/components/providers/ClientProviders'
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "Nuvigo - AI Weather Assistant",
-  description: "Get weather insights with a conversational AI assistant",
+  title: "Nuvigo - Assistente de Clima com IA",
+  description: "Obtenha insights do clima com um assistente conversacional de IA",
   icons: {
     icon: "/android-chrome-192x192.png",
     shortcut: "/android-chrome-192x192.png",

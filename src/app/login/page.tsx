@@ -15,8 +15,8 @@ import { useState, useEffect } from "react"
 
 // Define the validation schema
 const loginSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(1, { message: "Password is required" })
+  email: z.string().email({ message: "Por favor, insira um endereço de email válido" }),
+  password: z.string().min(1, { message: "A senha é obrigatória" })
 })
 
 // Type for the form data
@@ -64,7 +64,7 @@ export default function Login() {
       // The redirection will be handled by the useEffect above
     } catch (err) {
       console.error('Login failed:', err)
-      setError('Invalid email or password')
+      setError('Email ou senha inválidos')
     } finally {
       setIsLoggingIn(false)
     }
@@ -77,8 +77,8 @@ export default function Login() {
           <div className="flex justify-center mb-2">
             <Cloud className="h-10 w-10 text-primary" />
           </div>
-          <CardTitle className="text-2xl">Welcome back</CardTitle>
-          <CardDescription>Enter your email and password to login to your account</CardDescription>
+          <CardTitle className="text-2xl">Bem-vindo de volta</CardTitle>
+          <CardDescription>Digite seu email e senha para acessar sua conta</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">
@@ -92,7 +92,7 @@ export default function Login() {
               <Input
                 id="email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder="m@exemplo.com"
                 {...register("email")}
                 aria-invalid={!!errors.email}
                 aria-describedby={errors.email ? "email-error" : undefined}
@@ -103,9 +103,9 @@ export default function Login() {
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Senha</Label>
                 <Link href="/forgot-password" className="text-sm text-primary hover:underline">
-                  Forgot password?
+                  Esqueceu a senha?
                 </Link>
               </div>
               <Input
@@ -122,16 +122,16 @@ export default function Login() {
           </CardContent>
           <CardFooter className="flex flex-col space-y-4 mt-4">
             <Button type="submit" className="w-full cursor-pointer" disabled={isSubmitting || isLoggingIn}>
-              {isSubmitting || isLoggingIn ? "Logging in..." : "Login"}
+              {isSubmitting || isLoggingIn ? "Entrando..." : "Entrar"}
             </Button>
             <div className="text-center text-sm">
-              Don&apos;t have an account?{" "}
+              Não tem uma conta?{" "}
               <Link href="/signup" className="text-primary hover:underline">
-                Sign up
+                Cadastre-se
               </Link>
             </div>
             <Link href="/" passHref className="w-full">
-              <Button variant="outline" className="w-full cursor-pointer">Return to Home</Button>
+              <Button variant="outline" className="w-full cursor-pointer">Voltar para a Página Inicial</Button>
             </Link>
           </CardFooter>
         </form>

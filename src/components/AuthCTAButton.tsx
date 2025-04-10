@@ -11,7 +11,7 @@ export default function AuthCTAButton() {
   return (
     <Link href={isAuthenticated ? "/dashboard" : "/signup"}>
       <Button size="lg" className="gap-2 cursor-pointer">
-        {isAuthenticated ? "Go to Dashboard" : "Get Started"} <ArrowRight className="h-4 w-4" />
+        {isAuthenticated ? "Ir para o Painel" : "Começar"} <ArrowRight className="h-4 w-4" />
       </Button>
     </Link>
   );

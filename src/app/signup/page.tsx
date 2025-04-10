@@ -82,8 +82,8 @@ export default function Signup() {
           <div className="flex justify-center mb-2">
             <Cloud className="h-10 w-10 text-primary" />
           </div>
-          <CardTitle className="text-2xl">Create an account</CardTitle>
-          <CardDescription>Enter your information to create a Nuvigo account</CardDescription>
+          <CardTitle className="text-2xl">Criar uma conta</CardTitle>
+          <CardDescription>Digite suas informações para criar uma conta no Nuvigo</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">
@@ -94,10 +94,10 @@ export default function Signup() {
             )}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="firstName">First name</Label>
+                <Label htmlFor="firstName">Nome</Label>
                 <Input
                   id="firstName"
-                  placeholder="John"
+                  placeholder="João"
                   {...register("firstName")}
                   aria-invalid={!!errors.firstName}
                   aria-describedby={errors.firstName ? "firstName-error" : undefined}
@@ -107,10 +107,10 @@ export default function Signup() {
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastName">Last name</Label>
+                <Label htmlFor="lastName">Sobrenome</Label>
                 <Input
                   id="lastName"
-                  placeholder="Doe"
+                  placeholder="Silva"
                   {...register("lastName")}
                   aria-invalid={!!errors.lastName}
                   aria-describedby={errors.lastName ? "lastName-error" : undefined}
@@ -125,7 +125,7 @@ export default function Signup() {
               <Input
                 id="email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder="m@exemplo.com"
                 {...register("email")}
                 aria-invalid={!!errors.email}
                 aria-describedby={errors.email ? "email-error" : undefined}
@@ -135,7 +135,7 @@ export default function Signup() {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Senha</Label>
               <Input
                 id="password"
                 type="password"
@@ -148,7 +148,7 @@ export default function Signup() {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">Confirmar Senha</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -163,16 +163,16 @@ export default function Signup() {
           </CardContent>
           <CardFooter className="flex flex-col space-y-4 mt-4">
             <Button type="submit" className="w-full cursor-pointer" disabled={isSubmitting}>
-              {isSubmitting ? "Creating account..." : "Create account"}
+              {isSubmitting ? "Criando conta..." : "Criar conta"}
             </Button>
             <div className="text-center text-sm">
-              Already have an account?{" "}
+              Já tem uma conta?{" "}
               <Link href="/login" className="text-primary hover:underline">
-                Login
+                Entrar
               </Link>
             </div>
             <Link href="/" passHref className="w-full">
-              <Button variant="outline" className="w-full cursor-pointer">Return to Home</Button>
+              <Button variant="outline" className="w-full cursor-pointer">Voltar para a Página Inicial</Button>
             </Link>
           </CardFooter>
         </form>

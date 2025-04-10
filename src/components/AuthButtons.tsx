@@ -11,18 +11,18 @@ export default function AuthButtons() {
     <div className="flex items-center gap-4 whitespace-nowrap">
       {isAuthenticated ? (
         <>
-          <span className="text-sm text-muted-foreground">Welcome, {user?.name}</span>
+          <span className="text-sm text-muted-foreground">Bem-vindo, {user?.name}</span>
           <Link href="/dashboard">
-            <Button className="cursor-pointer">Dashboard</Button>
+            <Button className="cursor-pointer">Painel</Button>
           </Link>
         </>
       ) : (
         <>
           <Link href="/login">
-            <Button variant="ghost" className="cursor-pointer">Login</Button>
+            <Button variant="ghost" className="cursor-pointer">Entrar</Button>
           </Link>
           <Link href="/signup">
-            <Button className="cursor-pointer">Sign Up</Button>
+            <Button className="cursor-pointer">Cadastrar</Button>
           </Link>
         </>
       )}

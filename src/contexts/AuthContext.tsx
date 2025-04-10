@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, AuthTokens, LoginCredentials, RegisterCredentials, AuthResponse } from '@/types/auth';
+import { User, AuthTokens, LoginCredentials, RegisterCredentials, AuthResponse, ForgotPasswordCredentials, ResetPasswordCredentials } from '@/types/auth';
 import { setCookie, deleteCookie } from 'cookies-next';
 
 interface AuthContextType {
@@ -13,6 +13,8 @@ interface AuthContextType {
   register: (credentials: RegisterCredentials) => Promise<AuthResponse>;
   logout: () => Promise<void>;
   refreshToken: () => Promise<AuthTokens>;
+  forgotPassword: (credentials: ForgotPasswordCredentials) => Promise<{ success: boolean; message: string }>;
+  resetPassword: (credentials: ResetPasswordCredentials) => Promise<{ success: boolean; message: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,10 +34,10 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
 
   // Log the initial state for debugging
   useEffect(() => {
-    console.log('AuthProvider initialized with:', { 
-      initialAuthState, 
-      tokens, 
-      isAuthenticated 
+    console.log('AuthProvider initialized with:', {
+      initialAuthState,
+      tokens,
+      isAuthenticated
     });
   }, [initialAuthState, tokens, isAuthenticated]);
 
@@ -188,12 +190,12 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
       setIsAuthenticated(true);
       setCookieAndLocalStorage(authResponse.tokens);
 
-      console.log('Auth state updated after login:', { 
-        user: authResponse.user, 
-        tokens: authResponse.tokens, 
-        isAuthenticated: true 
+      console.log('Auth state updated after login:', {
+        user: authResponse.user,
+        tokens: authResponse.tokens,
+        isAuthenticated: true
       });
-      
+
       return authResponse;
     } catch (error) {
       console.error('Login error:', error);
@@ -300,6 +302,78 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
     }
   };
 
+  const forgotPassword = async (credentials: ForgotPasswordCredentials) => {
+    try {
+      console.log('Requesting password reset for email:', credentials.email);
+
+      const response = await fetch(`${API_URL}/auth/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error('Forgot password request failed:', data);
+        return {
+          success: false,
+          message: data.message || 'Falha ao solicitar redefinição de senha'
+        };
+      }
+
+      console.log('Password reset email sent successfully');
+      return {
+        success: true,
+        message: 'Email de redefinição de senha enviado com sucesso'
+      };
+    } catch (error) {
+      console.error('Error in forgotPassword:', error);
+      return {
+        success: false,
+        message: 'Ocorreu um erro ao solicitar redefinição de senha'
+      };
+    }
+  };
+
+  const resetPassword = async (credentials: ResetPasswordCredentials) => {
+    try {
+      console.log('Resetting password with token');
+
+      const response = await fetch(`${API_URL}/auth/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error('Password reset failed:', data);
+        return {
+          success: false,
+          message: data.message || 'Falha ao redefinir a senha'
+        };
+      }
+
+      console.log('Password reset successful');
+      return {
+        success: true,
+        message: 'Senha redefinida com sucesso'
+      };
+    } catch (error) {
+      console.error('Error in resetPassword:', error);
+      return {
+        success: false,
+        message: 'Ocorreu um erro ao redefinir a senha'
+      };
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -311,6 +385,8 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
         register,
         logout,
         refreshToken,
+        forgotPassword,
+        resetPassword,
       }}
     >
       {!isLoading && children}
