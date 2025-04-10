@@ -1,4 +1,6 @@
-import { useChat } from "@ai-sdk/react"
+"use client";
+
+import { useChat } from "@/hooks/use-chat"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -20,12 +22,17 @@ interface ChatTabProps {
   activeLocation: string;
   weatherData: WeatherData | null;
   loading: boolean;
+  initialMessages?: Array<{
+    id: string;
+    role: "user" | "assistant";
+    content: string;
+  }>;
 }
 
-export default function ChatTab({ activeLocation, weatherData, loading }: ChatTabProps) {
+export default function ChatTab({ activeLocation, weatherData, loading, initialMessages }: ChatTabProps) {
   const { messages, input, handleInputChange, handleSubmit, status } = useChat({
     api: "/api/chat",
-    initialMessages: [
+    initialMessages: initialMessages || [
       {
         id: "welcome",
         role: "assistant",

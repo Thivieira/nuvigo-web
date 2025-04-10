@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Cloud, CloudRain, Thermometer, Wind, Droplets, ChevronDown, ChevronUp } from "lucide-react"
