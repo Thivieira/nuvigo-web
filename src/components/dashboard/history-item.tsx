@@ -1,23 +1,24 @@
 import { Card } from "@/components/ui/card"
-import dayjs from "dayjs"
-import "dayjs/locale/pt-br"
-import relativeTime from "dayjs/plugin/relativeTime"
 import { useRouter } from "next/navigation"
-
-dayjs.extend(relativeTime)
-dayjs.locale("pt-br")
+import dayjs from "@/lib/dayjs"
+import DeleteSessionDialog from "./delete-session-dialog"
 
 interface HistoryItemProps {
   id: string
   title: string
   location: string
   createdAt: Date
+  onDelete?: () => void
 }
 
-export default function HistoryItem({ id, title, location, createdAt }: HistoryItemProps) {
+export default function HistoryItem({ id, title, location, createdAt, onDelete }: HistoryItemProps) {
   const router = useRouter()
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    // Prevent navigation if clicking on the delete button
+    if ((e.target as HTMLElement).closest('button')) {
+      return
+    }
     router.push(`/dashboard/chat/${id}`)
   }
 
@@ -26,13 +27,16 @@ export default function HistoryItem({ id, title, location, createdAt }: HistoryI
       className="p-4 hover:bg-slate-50 cursor-pointer transition-colors"
       onClick={handleClick}
     >
-      <div className="space-y-1">
-        <h3 className="font-medium">{title}</h3>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>{location}</span>
-          <span>•</span>
-          <span>{dayjs(createdAt).fromNow()}</span>
+      <div className="flex items-start justify-between">
+        <div className="space-y-1">
+          <h3 className="font-medium">{title}</h3>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>{location}</span>
+            <span>•</span>
+            <span>{dayjs(createdAt).fromNow()}</span>
+          </div>
         </div>
+        <DeleteSessionDialog sessionId={id} onConfirm={onDelete || (() => { })} />
       </div>
     </Card>
   )
