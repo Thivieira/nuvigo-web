@@ -2,23 +2,12 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Cloud, CloudRain, Thermometer, Wind, Droplets, ChevronDown, ChevronUp } from "lucide-react"
+import { CloudRain, Thermometer, Wind, Droplets, ChevronDown, ChevronUp } from "lucide-react"
 import { useEffect, useCallback, useState } from "react"
 import { Button } from "@/components/ui/button"
 import Image from "next/image";
 import { getIcon } from "@/lib/get-icon";
-
-interface WeatherData {
-  location: string
-  temperature: number
-  condition: string
-  high: number
-  low: number
-  precipitation: string
-  humidity: string
-  wind: string
-  weatherCode: number
-}
+import { WeatherData } from "@/types/weather";
 
 interface WeatherCardProps {
   data: WeatherData | null
@@ -124,7 +113,7 @@ export default function WeatherCard({ data, loading }: WeatherCardProps) {
                     <Wind className="h-5 w-5 text-primary" />
                     <div>
                       <p className="text-sm text-muted-foreground">Vento</p>
-                      <p className="font-medium">{data.wind}</p>
+                      <p className="font-medium">{data.windSpeed}</p>
                     </div>
                   </div>
                 </div>

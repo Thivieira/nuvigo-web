@@ -5,23 +5,12 @@ import DashboardTabs from "@/components/dashboard/dashboard-tabs"
 import { useLocation } from "@/contexts/location-context"
 import { useWeather } from "@/hooks/useWeather"
 import { useToast } from "@/hooks/use-toast"
-
-interface WeatherData {
-  location: string;
-  temperature: string;
-  condition: string;
-  high: string;
-  low: string;
-  humidity: string;
-  windSpeed: string;
-  precipitation: string;
-}
+import { WeatherData } from "@/types/weather"
 
 export default function Dashboard() {
   const { activeLocation } = useLocation()
   const { toast } = useToast()
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null)
-  const [loading, setLoading] = useState(true)
 
   const { data, error, isLoading } = useWeather({ location: activeLocation })
 
@@ -48,15 +37,14 @@ export default function Dashboard() {
         precipitation: data.precipitation,
         weatherCode: data.weatherCode,
       })
-      setLoading(false)
     }
   }, [data])
 
   return (
     <DashboardTabs
       activeLocation={activeLocation}
-      weatherData={weatherData} // Type assertion to bypass type mismatch
-      loading={loading}
+      weatherData={weatherData}
+      loading={isLoading}
     />
   )
 }

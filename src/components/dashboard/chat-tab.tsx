@@ -6,17 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Send } from "lucide-react"
 import WeatherCard from "@/components/weather-card"
-
-interface WeatherData {
-  location: string;
-  temperature: number;
-  condition: string;
-  high: number;
-  low: number;
-  precipitation: string;
-  humidity: string;
-  wind: string;
-}
+import { WeatherData } from "@/types/weather"
 
 interface ChatTabProps {
   activeLocation: string;

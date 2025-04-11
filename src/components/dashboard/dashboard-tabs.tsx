@@ -2,17 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { User, History } from "lucide-react"
 import ChatTab from "./chat-tab"
 import HistoryTab from "./history-tab"
-
-interface WeatherData {
-  location: string;
-  temperature: number;
-  condition: string;
-  high: number;
-  low: number;
-  precipitation: string;
-  humidity: string;
-  wind: string;
-}
+import { WeatherData } from "@/types/weather";
 
 interface DashboardTabsProps {
   activeLocation: string;
