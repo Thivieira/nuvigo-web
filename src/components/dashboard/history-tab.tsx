@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import HistoryItem from "./history-item"
 import { useEffect, useState } from "react"
 import { mockChatSessions, type ChatSession } from "@/mocks/chat-history"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
 
 export default function HistoryTab() {
   const [sessions, setSessions] = useState<ChatSession[]>([])
@@ -45,13 +45,14 @@ export default function HistoryTab() {
       toast({
         title: "Conversa excluída",
         description: "A conversa foi excluída com sucesso.",
+        type: "success"
       })
     } catch (error) {
       console.error('Error deleting session:', error)
       toast({
         title: "Erro",
         description: "Não foi possível excluir a conversa. Por favor, tente novamente.",
-        variant: "destructive",
+        type: "error"
       })
     }
   }
@@ -66,28 +67,23 @@ export default function HistoryTab() {
     )
   }
 
-  if (sessions.length === 0) {
-    return (
-      <Card>
-        <CardContent className="p-4">
-          <p className="text-muted-foreground">Seu histórico de conversas aparecerá aqui.</p>
-        </CardContent>
-      </Card>
-    )
-  }
-
   return (
-    <div className="space-y-4">
-      {sessions.map((session) => (
-        <HistoryItem
-          key={session.id}
-          id={session.id}
-          title={session.title}
-          location={session.location}
-          createdAt={session.createdAt}
-          onDelete={() => handleDelete(session.id)}
-        />
-      ))}
-    </div>
+    <Card>
+      <CardContent className="p-4">
+        {sessions.length === 0 ? (
+          <p className="text-muted-foreground">Nenhuma conversa encontrada.</p>
+        ) : (
+          <div className="space-y-4">
+            {sessions.map((session) => (
+              <HistoryItem
+                key={session.id}
+                session={session}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   )
 } 

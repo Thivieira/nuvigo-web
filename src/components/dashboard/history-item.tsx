@@ -1,42 +1,37 @@
 import { Card } from "@/components/ui/card"
-import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Trash2 } from "lucide-react"
 import dayjs from "@/lib/dayjs"
-import DeleteSessionDialog from "./delete-session-dialog"
+import type { ChatSession } from "@/mocks/chat-history"
 
 interface HistoryItemProps {
-  id: string
-  title: string
-  location: string
-  createdAt: Date
-  onDelete?: () => void
+  session: ChatSession
+  onDelete: (sessionId: string) => void
 }
 
-export default function HistoryItem({ id, title, location, createdAt, onDelete }: HistoryItemProps) {
-  const router = useRouter()
-
-  const handleClick = (e: React.MouseEvent) => {
-    // Prevent navigation if clicking on the delete button
-    if ((e.target as HTMLElement).closest('button')) {
-      return
-    }
-    router.push(`/dashboard/chat/${id}`)
-  }
-
+export default function HistoryItem({ session, onDelete }: HistoryItemProps) {
   return (
-    <Card
-      className="p-4 hover:bg-slate-50 cursor-pointer transition-colors"
-
-    >
+    <Card className="p-4">
       <div className="flex items-start justify-between">
-        <div className="space-y-1" onClick={handleClick} title={`Abrir conversa "${title}"`}>
-          <h3 className="font-medium">{title}</h3>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>{location}</span>
-            <span>•</span>
-            <span>{dayjs(createdAt).fromNow()}</span>
-          </div>
+        <div>
+          <h3 className="font-medium">{session.title}</h3>
+          <p className="text-sm text-muted-foreground">
+            {dayjs(session.createdAt).format("LL")}
+          </p>
+          {session.location && (
+            <p className="text-sm text-muted-foreground mt-1">
+              {session.location}
+            </p>
+          )}
         </div>
-        <DeleteSessionDialog sessionId={id} onConfirm={onDelete || (() => { })} />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onDelete(session.id)}
+          className="text-muted-foreground hover:text-destructive"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
       </div>
     </Card>
   )

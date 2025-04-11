@@ -15,9 +15,10 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/lib/toast';
 import { useAuth } from '@/contexts/auth-context';
 import { changePassword } from '@/services/userService';
+import { useRouter } from 'next/navigation';
 
 const passwordFormSchema = z.object({
   currentPassword: z.string().min(1, {
@@ -39,7 +40,7 @@ type PasswordFormValues = z.infer<typeof passwordFormSchema>;
 export function PasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { tokens } = useAuth();
-
+  const router = useRouter();
   const form = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordFormSchema),
     defaultValues: {
@@ -51,11 +52,7 @@ export function PasswordForm() {
 
   async function onSubmit(data: PasswordFormValues) {
     if (!tokens?.accessToken) {
-      toast({
-        title: 'Erro',
-        description: 'Você precisa estar autenticado para alterar sua senha.',
-        variant: 'destructive',
-      });
+      toast('Você precisa estar autenticado para alterar sua senha.', { type: 'error' });
       return;
     }
 
@@ -69,18 +66,11 @@ export function PasswordForm() {
       // Reset form after successful password change
       form.reset();
 
-      toast({
-        title: 'Senha alterada',
-        description: 'Sua senha foi alterada com sucesso.',
-      });
+      toast('Sua senha foi alterada com sucesso.', { type: 'success' });
       router.push('/dashboard/profile');
     } catch (error: any) {
       console.error('Error changing password:', error);
-      toast({
-        title: 'Erro',
-        description: error.message || 'Algo deu errado. Por favor, tente novamente.',
-        variant: 'destructive',
-      });
+      toast(error.message || 'Algo deu errado. Por favor, tente novamente.', { type: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -96,7 +86,7 @@ export function PasswordForm() {
             <FormItem>
               <FormLabel>Senha atual</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="Digite sua senha atual" {...field} />
+                <Input type="password" autoComplete="current-password" placeholder="Digite sua senha atual" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -109,7 +99,7 @@ export function PasswordForm() {
             <FormItem>
               <FormLabel>Nova senha</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="Digite sua nova senha" {...field} />
+                <Input type="password" autoComplete="new-password" placeholder="Digite sua nova senha" {...field} />
               </FormControl>
               <FormDescription>
                 A senha deve ter pelo menos 8 caracteres.
@@ -125,7 +115,7 @@ export function PasswordForm() {
             <FormItem>
               <FormLabel>Confirmar nova senha</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="Confirme sua nova senha" {...field} />
+                <Input type="password" autoComplete="new-password" placeholder="Confirme sua nova senha" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

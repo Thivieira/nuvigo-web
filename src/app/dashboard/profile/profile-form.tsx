@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/lib/toast';
 import { useAuth } from '@/contexts/auth-context';
 import { getCurrentUser, updateUserProfile } from '@/services/userService';
 
@@ -63,11 +63,7 @@ export function ProfileForm() {
         });
       } catch (error) {
         console.error('Error fetching user data:', error);
-        toast({
-          title: 'Erro',
-          description: 'Não foi possível carregar os dados do perfil.',
-          variant: 'destructive',
-        });
+        toast('Não foi possível carregar os dados do perfil.', { type: 'error' });
       } finally {
         setIsFetching(false);
       }
@@ -78,11 +74,7 @@ export function ProfileForm() {
 
   async function onSubmit(data: ProfileFormValues) {
     if (!tokens?.accessToken) {
-      toast({
-        title: 'Erro',
-        description: 'Você precisa estar autenticado para atualizar seu perfil.',
-        variant: 'destructive',
-      });
+      toast('Você precisa estar autenticado para atualizar seu perfil.', { type: 'error' });
       return;
     }
 
@@ -94,17 +86,10 @@ export function ProfileForm() {
         phone: data.phone,
       });
 
-      toast({
-        title: 'Perfil atualizado',
-        description: 'Seu perfil foi atualizado com sucesso.',
-      });
+      toast('Seu perfil foi atualizado com sucesso.', { type: 'success' });
     } catch (error: any) {
       console.error('Error updating profile:', error);
-      toast({
-        title: 'Erro',
-        description: error.message || 'Algo deu errado. Por favor, tente novamente.',
-        variant: 'destructive',
-      });
+      toast(error.message || 'Algo deu errado. Por favor, tente novamente.', { type: 'error' });
     } finally {
       setIsLoading(false);
     }
