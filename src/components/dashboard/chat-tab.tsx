@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react"
+import { useEffect, useRef } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Send, Loader2 } from "lucide-react"
+import { Send, Loader2, User, Bot } from "lucide-react"
 import { useChat } from "@/hooks/use-chat"
-import { useLocation } from "@/contexts/location-context"
 import { useToast } from "@/hooks/use-toast"
 import WeatherCard from "@/components/weather-card"
 import { WeatherData } from "@/types/weather"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
 interface ChatTabProps {
   activeLocation: string;
@@ -58,14 +58,16 @@ export default function ChatTab({ activeLocation, weatherData, loading, initialM
   }, [messages])
 
   useEffect(() => {
-    setMessages([
-      {
-        id: Date.now().toString(),
-        role: "assistant",
-        content: `Olá! Sou seu assistente meteorológico Nuvigo. Você pode me perguntar sobre o clima em ${activeLocation} ou em qualquer outro local. Como posso ajudar você hoje?`,
-      },
-    ])
-  }, [activeLocation, setMessages])
+    if (!initialMessages || initialMessages.length === 0) {
+      setMessages([
+        {
+          id: Date.now().toString(),
+          role: "assistant",
+          content: `Olá! Sou seu assistente meteorológico Nuvigo. Você pode me perguntar sobre o clima em ${activeLocation} ou em qualquer outro local. Como posso ajudar você hoje?`,
+        },
+      ])
+    }
+  }, [activeLocation, setMessages, initialMessages])
 
   return (
     <div className="space-y-4">
@@ -78,8 +80,15 @@ export default function ChatTab({ activeLocation, weatherData, loading, initialM
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                  className={`flex items-start gap-2 ${message.role === "user" ? "justify-end" : "justify-start"}`}
                 >
+                  {message.role === "assistant" && (
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        <Bot className="h-4 w-4" />
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
                   <div
                     className={`max-w-[80%] rounded-lg p-3 ${message.role === "user"
                       ? "bg-primary text-primary-foreground"
@@ -88,6 +97,13 @@ export default function ChatTab({ activeLocation, weatherData, loading, initialM
                   >
                     {message.content}
                   </div>
+                  {message.role === "user" && (
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        <User className="h-4 w-4" />
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
                 </div>
               ))}
               <div ref={messagesEndRef} />

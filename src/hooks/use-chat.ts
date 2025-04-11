@@ -57,20 +57,14 @@ export function useChat({
       setStatus('submitted');
 
       try {
-        // Cancel any ongoing request
-        if (abortControllerRef.current) {
-          abortControllerRef.current.abort();
-        }
 
-        // Create a new abort controller for this request
-        abortControllerRef.current = new AbortController();
 
         const response = await axiosInstance.post(api, {
-          messages: [...messages, userMessage],
-          id,
-        }, {
-          signal: abortControllerRef.current.signal,
-          responseType: 'stream',
+          chatSessionId: id,
+          message: input,
+          role: 'user',
+          turn: messages.length,
+          metadata: {}
         });
 
         if (onResponse) {
