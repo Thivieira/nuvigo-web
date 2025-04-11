@@ -1,13 +1,9 @@
 export interface ChatSession {
   id: string
+  userId: string
   title: string
-  location: string
-  createdAt: Date
-  messages: Array<{
-    id: string
-    role: "user" | "assistant"
-    content: string
-  }>
+  createdAt: string
+  updatedAt: string
 }
 
 export const mockChatSessions: ChatSession[] = [

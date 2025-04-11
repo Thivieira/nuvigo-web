@@ -76,11 +76,9 @@ export default function Login() {
       // The redirection will be handled by the useEffect above
     } catch (err: any) {
       console.error('Login failed:', err)
-      if (err.message && typeof err.message === 'string') {
-        setError(err.message)
-      } else {
-        setError('Email ou senha inválidos')
-      }
+      // Handle both string errors and error objects
+      const errorMessage = err.message || err.response?.data?.error || 'Email ou senha inválidos'
+      setError(errorMessage)
     } finally {
       setIsLoggingIn(false)
     }

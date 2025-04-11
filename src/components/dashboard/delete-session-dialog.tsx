@@ -27,7 +27,7 @@ export default function DeleteSessionDialog({ sessionId, onConfirm, disabled }: 
   const handleDelete = async () => {
     try {
       setIsDeleting(true)
-      await axiosInstance.delete(`/api/chat/sessions/${sessionId}`)
+      await axiosInstance.delete(`/chat/sessions/${sessionId}`)
       onConfirm()
       setOpen(false)
     } catch (error) {

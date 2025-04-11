@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { axiosInstance } from "@/lib/axios"
 
 interface ChatSessionPageProps {
   params: {
@@ -16,21 +17,11 @@ interface ChatSessionPageProps {
 
 async function getChatSession(id: string) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/sessions/${id}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch session")
-    }
-
-    return response.json()
+    const response = await axiosInstance.get(`/chat/sessions/${id}`);
+    return response.data;
   } catch (error) {
-    console.error("Error fetching chat session:", error)
-    // Fallback to mock data if API call fails
-    return mockChatSessions.find((s) => s.id === id) || null
+    console.error('Error fetching chat session:', error);
+    throw error;
   }
 }
 
@@ -70,7 +61,7 @@ export default function ChatSessionPage({ params }: ChatSessionPageProps) {
         activeLocation={session.location}
         weatherData={null}
         loading={false}
-        initialMessages={session.messages}
+        initialMessages={session.chats}
       />
     </div>
   )

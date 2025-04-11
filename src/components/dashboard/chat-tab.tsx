@@ -101,6 +101,7 @@ export default function ChatTab({ activeLocation, weatherData, loading, initialM
               />
               <Button
                 type="submit"
+                className="cursor-pointer"
                 disabled={(status === 'submitted' || status === 'streaming') || !input.trim()}
               >
                 {status === 'submitted' || status === 'streaming' ? (

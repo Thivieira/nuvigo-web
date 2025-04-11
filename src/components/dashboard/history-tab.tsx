@@ -12,7 +12,7 @@ export default function HistoryTab() {
 
   const fetchSessions = async () => {
     try {
-      const { data } = await axiosInstance.get<ChatSession[]>("/api/chat/sessions")
+      const { data } = await axiosInstance.get<ChatSession[]>("/chat/sessions")
       setSessions(data.map(session => ({
         ...session,
         createdAt: new Date(session.createdAt)
@@ -32,7 +32,7 @@ export default function HistoryTab() {
 
   const handleDelete = async (sessionId: string) => {
     try {
-      await axiosInstance.delete(`/api/chat/sessions/${sessionId}`)
+      await axiosInstance.delete(`/chat/sessions/${sessionId}`)
       setSessions(prev => prev.filter(session => session.id !== sessionId))
       toast({
         title: "Conversa excluída",

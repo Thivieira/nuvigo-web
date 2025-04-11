@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Trash2 } from "lucide-react"
 import dayjs from "@/lib/dayjs"
 import type { ChatSession } from "@/mocks/chat-history"
-
+import Link from "next/link"
 interface HistoryItemProps {
   session: ChatSession
   onDelete: (sessionId: string) => void
@@ -13,17 +13,12 @@ export default function HistoryItem({ session, onDelete }: HistoryItemProps) {
   return (
     <Card className="p-4">
       <div className="flex items-start justify-between">
-        <div>
+        <Link href={`/dashboard/chat/${session.id}`} className="cursor-pointer" title="Abrir conversa">
           <h3 className="font-medium">{session.title}</h3>
           <p className="text-sm text-muted-foreground">
-            {dayjs(session.createdAt).format("LL")}
+            Última atualização: {dayjs(session.updatedAt).format("DD/MM/YYYY HH:mm")}
           </p>
-          {session.location && (
-            <p className="text-sm text-muted-foreground mt-1">
-              {session.location}
-            </p>
-          )}
-        </div>
+        </Link>
         <Button
           variant="ghost"
           size="icon"

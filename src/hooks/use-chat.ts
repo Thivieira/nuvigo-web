@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { axiosInstance } from '@/lib/axios';
+import { AxiosResponse } from 'axios';
 
 export interface Message {
   id: string;
@@ -12,7 +14,7 @@ export interface UseChatOptions {
   api?: string;
   id?: string;
   initialMessages?: Message[];
-  onResponse?: (response: Response) => void;
+  onResponse?: (response: AxiosResponse) => void;
   onFinish?: (message: Message) => void;
   onError?: (error: Error) => void;
 }
@@ -20,7 +22,7 @@ export interface UseChatOptions {
 export type ChatStatus = 'idle' | 'submitted' | 'streaming' | 'error';
 
 export function useChat({
-  api = '/api/chat',
+  api = '/chat',
   id,
   initialMessages = [],
   onResponse,
@@ -63,21 +65,13 @@ export function useChat({
         // Create a new abort controller for this request
         abortControllerRef.current = new AbortController();
 
-        const response = await fetch(api, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            messages: [...messages, userMessage],
-            id,
-          }),
+        const response = await axiosInstance.post(api, {
+          messages: [...messages, userMessage],
+          id,
+        }, {
           signal: abortControllerRef.current.signal,
+          responseType: 'stream',
         });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
 
         if (onResponse) {
           onResponse(response);
@@ -86,7 +80,7 @@ export function useChat({
         setStatus('streaming');
 
         // Handle streaming response
-        const reader = response.body?.getReader();
+        const reader = response.data.getReader();
         if (!reader) {
           throw new Error('No reader available');
         }

@@ -164,8 +164,12 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
       });
 
       return responseData;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
+      // Handle the specific error format from the server
+      if (error.response?.data?.error) {
+        throw new Error(error.response.data.error);
+      }
       throw error;
     }
   };

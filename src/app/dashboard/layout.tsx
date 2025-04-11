@@ -10,6 +10,7 @@ import { useLocation } from "@/contexts/location-context"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useEffect } from "react"
+import { Logo } from "@/components/logo"
 
 export default function DashboardLayout({
   children,
@@ -58,10 +59,9 @@ export default function DashboardLayout({
   const SidebarContent = () => (
     <>
       <div className="p-4 border-b" style={{ height: '65px' }}>
-        <div className="flex items-center gap-2 cursor-default">
-          <Cloud className="h-6 w-6 text-primary" />
-          <span className="text-xl font-bold">Nuvigo</span>
-        </div>
+        <Link href="/dashboard" className="flex items-center gap-2 cursor-pointer">
+          <Logo />
+        </Link>
       </div>
       <div className="flex-1 overflow-auto p-4">
         <div className="mb-6">
@@ -154,13 +154,12 @@ export default function DashboardLayout({
             </div>
 
             {/* Mobile Logo (Center) */}
-            <div className="flex items-center gap-2 md:hidden">
-              <Cloud className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold">Nuvigo</span>
-            </div>
+            <Link href="/dashboard" className="flex cursor-pointer items-center gap-2 md:hidden">
+              <Logo />
+            </Link>
 
             {/* Desktop Title */}
-            <h1 className="text-xl font-bold hidden md:block">Painel de Controle</h1>
+            <h1 className="text-xl font-bold hidden md:block cursor-default">Painel de Controle</h1>
 
             {/* Avatar (Right side - always visible) */}
             <Link href="/dashboard/profile" className="cursor-pointer" title="Atualizar o perfil">
