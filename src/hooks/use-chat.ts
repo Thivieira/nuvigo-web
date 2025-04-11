@@ -156,5 +156,6 @@ export function useChat({
     handleInputChange,
     handleSubmit,
     status,
+    setMessages,
   };
 } 
