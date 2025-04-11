@@ -1,10 +1,12 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { MapPin } from "lucide-react"
+import { MapPin, Loader2 } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import AddLocationDialog from "./add-location-dialog"
 import DeleteLocationDialog from "./delete-location-dialog"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { AlertCircle } from "lucide-react"
 
 interface SavedLocationsProps {
   locations: string[]
@@ -12,6 +14,8 @@ interface SavedLocationsProps {
   onLocationChange: (location: string) => void
   onAddLocation?: (location: string) => void
   onDeleteLocation?: (location: string) => void
+  isLoading?: boolean
+  error?: Error | null
 }
 
 export default function SavedLocations({
@@ -19,8 +23,29 @@ export default function SavedLocations({
   activeLocation,
   onLocationChange,
   onAddLocation = () => { },
-  onDeleteLocation = () => { }
+  onDeleteLocation = () => { },
+  isLoading = false,
+  error = null
 }: SavedLocationsProps) {
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-4">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive" className="mb-4">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          {error.message}
+        </AlertDescription>
+      </Alert>
+    )
+  }
+
   return (
     <div className="space-y-1 w-full">
       {locations.map((location) => (

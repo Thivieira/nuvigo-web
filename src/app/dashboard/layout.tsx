@@ -18,7 +18,15 @@ export default function DashboardLayout({
 }) {
   const router = useRouter()
   const { user, logout, isAuthenticated } = useAuth()
-  const { activeLocation, savedLocations, setActiveLocation, handleAddLocation, handleDeleteLocation } = useLocation()
+  const {
+    activeLocation,
+    savedLocations,
+    setActiveLocation,
+    handleAddLocation,
+    handleDeleteLocation,
+    isLoading,
+    error
+  } = useLocation()
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -85,6 +93,8 @@ export default function DashboardLayout({
             onLocationChange={setActiveLocation}
             onAddLocation={handleAddLocation}
             onDeleteLocation={handleDeleteLocation}
+            isLoading={isLoading}
+            error={error}
           />
         </div>
         <div className="mb-6">
