@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { Cloud } from "lucide-react"
+import { Cloud, Eye, EyeOff } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useState, useEffect } from "react"
@@ -27,7 +27,18 @@ export default function Login() {
   const searchParams = useSearchParams()
   const { login, isAuthenticated } = useAuth()
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
   const [isLoggingIn, setIsLoggingIn] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+
+  // Check for verification success message
+  useEffect(() => {
+    if (searchParams.get('verified') === 'true') {
+      setSuccess('Email verificado com sucesso! Você já pode fazer login.')
+    } else if (searchParams.get('registered') === 'true') {
+      setSuccess('Conta criada com sucesso! Por favor, verifique seu email para ativar sua conta.')
+    }
+  }, [searchParams])
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -55,6 +66,7 @@ export default function Login() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       setError(null)
+      setSuccess(null)
       setIsLoggingIn(true)
       console.log('Submitting login form with email:', data.email);
 
@@ -62,9 +74,13 @@ export default function Login() {
       console.log('Login successful, response:', response);
 
       // The redirection will be handled by the useEffect above
-    } catch (err) {
+    } catch (err: any) {
       console.error('Login failed:', err)
-      setError('Email ou senha inválidos')
+      if (err.message && typeof err.message === 'string') {
+        setError(err.message)
+      } else {
+        setError('Email ou senha inválidos')
+      }
     } finally {
       setIsLoggingIn(false)
     }
@@ -85,6 +101,11 @@ export default function Login() {
             {error && (
               <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm">
                 {error}
+              </div>
+            )}
+            {success && (
+              <div className="p-3 bg-green-50 text-green-700 rounded-md text-sm">
+                {success}
               </div>
             )}
             <div className="space-y-2">
@@ -108,13 +129,32 @@ export default function Login() {
                   Esqueceu a senha?
                 </Link>
               </div>
-              <Input
-                id="password"
-                type="password"
-                {...register("password")}
-                aria-invalid={!!errors.password}
-                aria-describedby={errors.password ? "password-error" : undefined}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  {...register("password")}
+                  placeholder="********"
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? "password-error" : undefined}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent cursor-pointer"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  )}
+                  <span className="sr-only">
+                    {showPassword ? "Ocultar senha" : "Mostrar senha"}
+                  </span>
+                </Button>
+              </div>
               {errors.password && (
                 <p id="password-error" className="text-sm text-destructive">{errors.password.message}</p>
               )}

@@ -83,7 +83,7 @@ export default function ResetPassword() {
         setMessage({ type: 'success', text: result.message })
         // Redirect to login after successful password reset
         setTimeout(() => {
-          router.push('/login')
+          router.push('/login?reset=true')
         }, 3000)
       } else {
         setMessage({ type: 'error', text: result.message })
@@ -138,7 +138,7 @@ export default function ResetPassword() {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
+              <Label htmlFor="confirmPassword">Confirmar Senha</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -154,10 +154,10 @@ export default function ResetPassword() {
               )}
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
+          <CardFooter className="flex flex-col space-y-4 mt-4">
             <Button
               type="submit"
-              className="w-full"
+              className="w-full cursor-pointer"
               disabled={isSubmitting || !token}
             >
               {isSubmitting ? "Redefinindo..." : "Redefinir Senha"}

@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Cloud } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 
 // Define the validation schema
 const forgotPasswordSchema = z.object({
@@ -21,6 +22,7 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>
 
 export default function ForgotPassword() {
+  const router = useRouter()
   const { forgotPassword } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
@@ -44,12 +46,23 @@ export default function ForgotPassword() {
       setMessage(null)
       console.log('Submitting forgot password form with email:', data.email)
 
-      const result = await forgotPassword(data)
+      const result = await forgotPassword({ email: data.email })
 
       if (result.success) {
-        setMessage({ type: 'success', text: result.message })
+        setMessage({
+          type: 'success',
+          text: 'Instruções para redefinição de senha foram enviadas para seu email'
+        })
+
+        // Redirect to login page after 3 seconds
+        setTimeout(() => {
+          router.push('/login?emailSent=true')
+        }, 3000)
       } else {
-        setMessage({ type: 'error', text: result.message })
+        setMessage({
+          type: 'error',
+          text: result.message || 'Ocorreu um erro ao solicitar a redefinição de senha'
+        })
       }
     } catch (err) {
       console.error('Forgot password request failed:', err)

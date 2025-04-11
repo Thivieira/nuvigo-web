@@ -16,26 +16,29 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/use-toast';
+import { useAuth } from '@/contexts/auth-context';
+import { changePassword } from '@/services/userService';
 
 const passwordFormSchema = z.object({
   currentPassword: z.string().min(1, {
     message: 'A senha atual é obrigatória.',
   }),
   newPassword: z.string().min(8, {
-    message: 'A senha deve ter pelo menos 8 caracteres.',
+    message: 'A nova senha deve ter pelo menos 8 caracteres.',
   }),
   confirmPassword: z.string().min(1, {
-    message: 'Por favor, confirme sua senha.',
+    message: 'A confirmação de senha é obrigatória.',
   }),
 }).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "As senhas não coincidem",
-  path: ["confirmPassword"],
+  message: 'As senhas não coincidem.',
+  path: ['confirmPassword'],
 });
 
 type PasswordFormValues = z.infer<typeof passwordFormSchema>;
 
 export function PasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const { tokens } = useAuth();
 
   const form = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordFormSchema),
@@ -47,19 +50,35 @@ export function PasswordForm() {
   });
 
   async function onSubmit(data: PasswordFormValues) {
-    setIsLoading(true);
-    try {
-      // TODO: Implement API call to update password
-      console.log(data);
-      toast({
-        title: 'Senha atualizada',
-        description: 'Sua senha foi atualizada com sucesso.',
-      });
-      form.reset();
-    } catch (error) {
+    if (!tokens?.accessToken) {
       toast({
         title: 'Erro',
-        description: 'Algo deu errado. Por favor, tente novamente.',
+        description: 'Você precisa estar autenticado para alterar sua senha.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await changePassword(tokens.accessToken, {
+        oldPassword: data.currentPassword,
+        newPassword: data.newPassword,
+      });
+
+      // Reset form after successful password change
+      form.reset();
+
+      toast({
+        title: 'Senha alterada',
+        description: 'Sua senha foi alterada com sucesso.',
+      });
+      router.push('/dashboard/profile');
+    } catch (error: any) {
+      console.error('Error changing password:', error);
+      toast({
+        title: 'Erro',
+        description: error.message || 'Algo deu errado. Por favor, tente novamente.',
         variant: 'destructive',
       });
     } finally {
@@ -75,7 +94,7 @@ export function PasswordForm() {
           name="currentPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Senha Atual</FormLabel>
+              <FormLabel>Senha atual</FormLabel>
               <FormControl>
                 <Input type="password" placeholder="Digite sua senha atual" {...field} />
               </FormControl>
@@ -88,7 +107,7 @@ export function PasswordForm() {
           name="newPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nova Senha</FormLabel>
+              <FormLabel>Nova senha</FormLabel>
               <FormControl>
                 <Input type="password" placeholder="Digite sua nova senha" {...field} />
               </FormControl>
@@ -104,7 +123,7 @@ export function PasswordForm() {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirmar Nova Senha</FormLabel>
+              <FormLabel>Confirmar nova senha</FormLabel>
               <FormControl>
                 <Input type="password" placeholder="Confirme sua nova senha" {...field} />
               </FormControl>
@@ -112,8 +131,8 @@ export function PasswordForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? 'Atualizando...' : 'Atualizar senha'}
+        <Button type="submit" className="cursor-pointer" disabled={isLoading}>
+          {isLoading ? 'Alterando senha...' : 'Alterar senha'}
         </Button>
       </form>
     </Form>

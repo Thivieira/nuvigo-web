@@ -32,6 +32,8 @@ export default function Signup() {
   const router = useRouter()
   const { register: registerUser, isAuthenticated } = useAuth()
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+  const [isRegistering, setIsRegistering] = useState(false)
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -60,6 +62,8 @@ export default function Signup() {
   const onSubmit = async (data: SignupFormData) => {
     try {
       setError(null)
+      setSuccess(null)
+      setIsRegistering(true)
 
       // Combine first and last name for the API
       await registerUser({
@@ -68,10 +72,21 @@ export default function Signup() {
         password: data.password
       })
 
-      // The redirection will be handled by the useEffect above
-    } catch (err) {
+      setSuccess('Conta criada com sucesso! Por favor, verifique seu email para ativar sua conta.')
+
+      // Redirect to login page after a short delay
+      setTimeout(() => {
+        router.push('/login?registered=true')
+      }, 3000)
+    } catch (err: any) {
       console.error('Registration failed:', err)
-      setError('Registration failed. Please try again.')
+      if (err.message && typeof err.message === 'string') {
+        setError(err.message)
+      } else {
+        setError('Falha no registro. Por favor, tente novamente.')
+      }
+    } finally {
+      setIsRegistering(false)
     }
   }
 
@@ -90,6 +105,11 @@ export default function Signup() {
             {error && (
               <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm">
                 {error}
+              </div>
+            )}
+            {success && (
+              <div className="p-3 bg-green-50 text-green-700 rounded-md text-sm">
+                {success}
               </div>
             )}
             <div className="grid grid-cols-2 gap-4">
@@ -162,8 +182,8 @@ export default function Signup() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4 mt-4">
-            <Button type="submit" className="w-full cursor-pointer" disabled={isSubmitting}>
-              {isSubmitting ? "Criando conta..." : "Criar conta"}
+            <Button type="submit" className="w-full cursor-pointer" disabled={isSubmitting || isRegistering}>
+              {isSubmitting || isRegistering ? "Criando conta..." : "Criar conta"}
             </Button>
             <div className="text-center text-sm">
               Já tem uma conta?{" "}

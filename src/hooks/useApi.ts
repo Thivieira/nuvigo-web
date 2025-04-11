@@ -2,12 +2,41 @@
 
 import { useAuth } from '@/contexts/auth-context';
 import { useCallback } from 'react';
+import useSWR from 'swr';
+import axiosInstance from '../lib/axios';
 
 interface RequestOptions extends RequestInit {
   requireAuth?: boolean;
 }
 
-export function useApi() {
+// Fetcher function for SWR
+const fetcher = async (url: string) => {
+  const response = await axiosInstance.get(url);
+  return response.data;
+};
+
+// Generic hook for fetching data with SWR
+export function useApi<T>(url: string | null, options = {}) {
+  return useSWR<T>(url, fetcher, {
+    revalidateOnFocus: false,
+    ...options,
+  });
+}
+
+// Hook for fetching data with SWR and error handling
+export function useApiWithError<T>(url: string | null, options = {}) {
+  const { data, error, isLoading, mutate } = useApi<T>(url, options);
+
+  return {
+    data,
+    error: error?.response?.data?.message || error?.message,
+    isLoading,
+    mutate,
+    isError: !!error,
+  };
+}
+
+export function useApiOld() {
   const { tokens, refreshToken } = useAuth();
 
   const fetchWithAuth = useCallback(async (url: string, options: RequestOptions = {}) => {

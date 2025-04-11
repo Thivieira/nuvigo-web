@@ -15,6 +15,7 @@ interface AuthContextType {
   refreshToken: () => Promise<AuthTokens>;
   forgotPassword: (credentials: ForgotPasswordCredentials) => Promise<{ success: boolean; message: string }>;
   resetPassword: (credentials: ResetPasswordCredentials) => Promise<{ success: boolean; message: string }>;
+  verifyEmail: (credentials: { token: string }) => Promise<{ success: boolean; message: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -374,6 +375,42 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
     }
   };
 
+  const verifyEmail = async (credentials: { token: string }) => {
+    try {
+      console.log('Verifying email with token');
+
+      const response = await fetch(`${API_URL}/auth/verify-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error('Email verification failed:', data);
+        return {
+          success: false,
+          message: data.message || 'Falha na verificação do email'
+        };
+      }
+
+      console.log('Email verification successful');
+      return {
+        success: true,
+        message: 'Email verificado com sucesso'
+      };
+    } catch (error) {
+      console.error('Error in verifyEmail:', error);
+      return {
+        success: false,
+        message: 'Ocorreu um erro ao verificar o email'
+      };
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -387,6 +424,7 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
         refreshToken,
         forgotPassword,
         resetPassword,
+        verifyEmail,
       }}
     >
       {!isLoading && children}

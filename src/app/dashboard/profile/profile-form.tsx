@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+import { PatternFormat } from 'react-number-format';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -16,6 +17,8 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/use-toast';
+import { useAuth } from '@/contexts/auth-context';
+import { getCurrentUser, updateUserProfile } from '@/services/userService';
 
 const profileFormSchema = z.object({
   name: z.string().min(2, {
@@ -31,6 +34,8 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export function ProfileForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
+  const { tokens } = useAuth();
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -41,19 +46,63 @@ export function ProfileForm() {
     },
   });
 
+  // Fetch user data on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!tokens?.accessToken) {
+        setIsFetching(false);
+        return;
+      }
+
+      try {
+        const userData = await getCurrentUser(tokens.accessToken);
+        form.reset({
+          name: userData.name || '',
+          email: userData.email || '',
+          phone: userData.phone || '',
+        });
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        toast({
+          title: 'Erro',
+          description: 'Não foi possível carregar os dados do perfil.',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsFetching(false);
+      }
+    };
+
+    fetchUserData();
+  }, [form, tokens]);
+
   async function onSubmit(data: ProfileFormValues) {
+    if (!tokens?.accessToken) {
+      toast({
+        title: 'Erro',
+        description: 'Você precisa estar autenticado para atualizar seu perfil.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // TODO: Implement API call to update profile
-      console.log(data);
+      await updateUserProfile(tokens.accessToken, {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+      });
+
       toast({
         title: 'Perfil atualizado',
         description: 'Seu perfil foi atualizado com sucesso.',
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error updating profile:', error);
       toast({
         title: 'Erro',
-        description: 'Algo deu errado. Por favor, tente novamente.',
+        description: error.message || 'Algo deu errado. Por favor, tente novamente.',
         variant: 'destructive',
       });
     } finally {
@@ -71,7 +120,7 @@ export function ProfileForm() {
             <FormItem>
               <FormLabel>Nome</FormLabel>
               <FormControl>
-                <Input placeholder="Seu nome" {...field} />
+                <Input placeholder="Seu nome" {...field} disabled={isFetching} />
               </FormControl>
               <FormDescription>
                 Este é seu nome de exibição público.
@@ -87,7 +136,7 @@ export function ProfileForm() {
             <FormItem>
               <FormLabel>E-mail</FormLabel>
               <FormControl>
-                <Input placeholder="seu.email@exemplo.com" {...field} />
+                <Input disabled placeholder="seu.email@exemplo.com" {...field} />
               </FormControl>
               <FormDescription>
                 Seu endereço de e-mail para notificações.
@@ -103,7 +152,17 @@ export function ProfileForm() {
             <FormItem>
               <FormLabel>Telefone</FormLabel>
               <FormControl>
-                <Input placeholder="Seu número de telefone" {...field} />
+                <PatternFormat
+                  customInput={Input}
+                  format="(##) #####-####"
+                  mask="_"
+                  placeholder="(00) 00000-0000"
+                  value={field.value}
+                  onValueChange={(values) => {
+                    field.onChange(values.value);
+                  }}
+                  disabled={isFetching}
+                />
               </FormControl>
               <FormDescription>
                 Seu número de telefone de contato.
@@ -112,7 +171,7 @@ export function ProfileForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={isLoading}>
+        <Button type="submit" className="cursor-pointer" disabled={isLoading || isFetching}>
           {isLoading ? 'Salvando...' : 'Salvar alterações'}
         </Button>
       </form>

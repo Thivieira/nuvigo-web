@@ -70,7 +70,7 @@ export default function DashboardLayout({
             </Avatar>
             <div>
               <p className="font-medium">{user?.name || 'Usuário'}</p>
-              <p className="text-sm text-muted-foreground">{user?.email || 'usuario@exemplo.com'}</p>
+              <p className="text-sm text-muted-foreground overflow-hidden text-ellipsis whitespace-nowrap max-w-[150px]">{user?.email || 'usuario@exemplo.com'}</p>
             </div>
           </div>
         </div>
