@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 let cachedIcons: string[] | null = null;
 
 /**
@@ -9,8 +11,7 @@ export const getIcon = async (weatherCode: number): Promise<string> => {
   // Fetch icons if not cached
   if (!cachedIcons) {
     try {
-      const response = await fetch('/api/weather-icons');
-      const data = await response.json();
+      const { data } = await axios.get<{ files: string[] }>('/api/weather-icons');
       cachedIcons = data.files;
     } catch (error) {
       console.error('Failed to fetch weather icons:', error);

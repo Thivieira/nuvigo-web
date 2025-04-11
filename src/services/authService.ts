@@ -1,4 +1,4 @@
-import axiosInstance from '../lib/axios';
+import { axiosInstance } from '../lib/axios';
 import { setCookie, deleteCookie, getCookie } from 'cookies-next';
 import { LoginCredentials, RegisterCredentials, AuthResponse, ForgotPasswordCredentials, ResetPasswordCredentials, AuthTokens } from '@/types/auth';
 
@@ -58,78 +58,50 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333';
  * Authenticates a user with email and password
  */
 export const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
-  const response = await fetch(`${API_URL}/auth/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(credentials),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Falha no login');
+  try {
+    const { data } = await axiosInstance.post<AuthResponse>('/auth/login', credentials);
+    return data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Falha no login');
   }
-
-  return response.json();
 };
 
 /**
  * Registers a new user
  */
 export const register = async (credentials: RegisterCredentials): Promise<AuthResponse> => {
-  const response = await fetch(`${API_URL}/auth/register`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(credentials),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Falha no registro');
+  try {
+    const { data } = await axiosInstance.post<AuthResponse>('/auth/register', credentials);
+    return data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Falha no registro');
   }
-
-  return response.json();
 };
 
 /**
  * Refreshes the authentication token
  */
 export const refreshToken = async (refreshToken: string): Promise<AuthTokens> => {
-  const response = await fetch(`${API_URL}/auth/refresh`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ refreshToken }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Falha ao atualizar o token');
+  try {
+    const { data } = await axiosInstance.post<AuthTokens>('/auth/refresh', { refreshToken });
+    return data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Falha ao atualizar o token');
   }
-
-  return response.json();
 };
 
 /**
  * Logs out the user
  */
 export const logout = async (refreshToken: string, accessToken: string): Promise<void> => {
-  const response = await fetch(`${API_URL}/auth/logout`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify({ refreshToken }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Falha ao fazer logout');
+  try {
+    await axiosInstance.post('/auth/logout', { refreshToken }, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Falha ao fazer logout');
   }
 };
 
@@ -137,72 +109,45 @@ export const logout = async (refreshToken: string, accessToken: string): Promise
  * Sends a password reset email
  */
 export const forgotPassword = async (credentials: ForgotPasswordCredentials): Promise<{ success: boolean; message: string }> => {
-  const response = await fetch(`${API_URL}/auth/forgot-password`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(credentials),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || 'Falha ao enviar email de recuperação');
+  try {
+    await axiosInstance.post('/auth/forgot-password', credentials);
+    return {
+      success: true,
+      message: 'Email de recuperação enviado com sucesso'
+    };
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Falha ao enviar email de recuperação');
   }
-
-  return {
-    success: true,
-    message: 'Email de recuperação enviado com sucesso'
-  };
 };
 
 /**
  * Resets the user's password
  */
 export const resetPassword = async (credentials: ResetPasswordCredentials): Promise<{ success: boolean; message: string }> => {
-  const response = await fetch(`${API_URL}/auth/reset-password`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(credentials),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || 'Falha ao redefinir a senha');
+  try {
+    await axiosInstance.post('/auth/reset-password', credentials);
+    return {
+      success: true,
+      message: 'Senha redefinida com sucesso'
+    };
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Falha ao redefinir a senha');
   }
-
-  return {
-    success: true,
-    message: 'Senha redefinida com sucesso'
-  };
 };
 
 /**
  * Verifies the user's email
  */
 export const verifyEmail = async (credentials: { token: string }): Promise<{ success: boolean; message: string }> => {
-  const response = await fetch(`${API_URL}/auth/verify-email`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(credentials),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || 'Falha na verificação do email');
+  try {
+    await axiosInstance.post('/auth/verify-email', credentials);
+    return {
+      success: true,
+      message: 'Email verificado com sucesso'
+    };
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Falha na verificação do email');
   }
-
-  return {
-    success: true,
-    message: 'Email verificado com sucesso'
-  };
 };
 
 // Auth service functions

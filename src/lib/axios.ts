@@ -1,23 +1,27 @@
 import axios from 'axios';
-import { getCookie, setCookie } from 'cookies-next';
 
-// API base URL from environment variable or default
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333';
 
-// Create Axios instance with default config
-const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+// Create axios instance with default config
+export const axiosInstance = axios.create({
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 10000, // 10 seconds
+  withCredentials: true,
 });
 
-// Add request interceptor to add auth token
+// Request interceptor for adding auth token
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = getCookie('authToken');
-    if (token && config.headers) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+    // Get token from localStorage
+    const authTokens = localStorage.getItem('auth_tokens');
+    if (authTokens) {
+      const { accessToken } = JSON.parse(authTokens);
+      if (accessToken) {
+        config.headers.Authorization = `Bearer ${accessToken}`;
+      }
     }
     return config;
   },
@@ -26,42 +30,53 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Add response interceptor to handle errors and token refresh
+// Response interceptor for handling token expiration
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Handle 401 Unauthorized errors (token expired)
+    // If error is 401 and we haven't tried to refresh the token yet
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        // Try to refresh the token
-        const refreshToken = getCookie('refreshToken');
-        if (!refreshToken) {
-          throw new Error('No refresh token available');
+        // Get refresh token from localStorage
+        const authTokens = localStorage.getItem('auth_tokens');
+        if (!authTokens) {
+          throw new Error('No auth tokens found');
         }
 
-        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
+        const { refreshToken } = JSON.parse(authTokens);
+        if (!refreshToken) {
+          throw new Error('No refresh token found');
+        }
+
+        // Call refresh token endpoint
+        const response = await axios.post(`${API_URL}/auth/refresh`, {
           refreshToken,
         });
 
-        if (response.data?.token) {
-          // Update tokens in cookies
-          setCookie('authToken', response.data.token);
-          setCookie('refreshToken', response.data.refreshToken);
+        const { accessToken, refreshToken: newRefreshToken } = response.data;
 
-          // Update the Authorization header
-          originalRequest.headers['Authorization'] = `Bearer ${response.data.token}`;
+        // Update tokens in localStorage
+        localStorage.setItem(
+          'auth_tokens',
+          JSON.stringify({
+            accessToken,
+            refreshToken: newRefreshToken,
+          })
+        );
 
-          // Retry the original request
-          return axiosInstance(originalRequest);
-        }
+        // Update the Authorization header
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+
+        // Retry the original request
+        return axiosInstance(originalRequest);
       } catch (refreshError) {
-        // If refresh token fails, redirect to login
-        console.error('Token refresh failed:', refreshError);
-        // You could implement a redirect to login page here
+        // If refresh token fails, clear auth tokens and redirect to login
+        localStorage.removeItem('auth_tokens');
+        window.location.href = '/login';
         return Promise.reject(refreshError);
       }
     }
@@ -70,4 +85,21 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-export default axiosInstance; 
+// Add retry logic for network errors and 5xx responses
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const { config } = error;
+    if (!config || !config.retry) {
+      return Promise.reject(error);
+    }
+
+    config.retry -= 1;
+    const delayRetry = new Promise((resolve) => {
+      setTimeout(resolve, config.retryDelay || 1000);
+    });
+
+    await delayRetry;
+    return axiosInstance(config);
+  }
+); 

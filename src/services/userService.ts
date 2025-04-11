@@ -1,4 +1,4 @@
-import axiosInstance from '../lib/axios';
+import { axiosInstance } from '../lib/axios';
 import { User } from './authService';
 
 // Create user request type
@@ -52,64 +52,49 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333';
  * Gets the current user's profile
  */
 export const getCurrentUser = async (accessToken: string): Promise<User> => {
-  const response = await fetch(`${API_URL}/auth/me`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Falha ao obter perfil do usuário');
+  try {
+    const { data } = await axiosInstance.get<User>('/auth/me', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Falha ao obter perfil do usuário');
   }
-
-  return response.json();
 };
 
 /**
  * Updates the current user's profile
  */
 export const updateUserProfile = async (accessToken: string, data: { name?: string; email?: string; phone?: string }): Promise<User> => {
-  const response = await fetch(`${API_URL}/user`, {
-    method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Falha ao atualizar perfil do usuário');
+  try {
+    const { data: responseData } = await axiosInstance.put<User>('/user', data, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return responseData;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Falha ao atualizar perfil do usuário');
   }
-
-  return response.json();
 };
 
 /**
  * Changes the user's password
  */
 export const changePassword = async (accessToken: string, data: { oldPassword: string; newPassword: string }): Promise<{ success: boolean; message: string }> => {
-  const response = await fetch(`${API_URL}/auth/change-password`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-
-  const responseData = await response.json();
-
-  if (!response.ok) {
-    throw new Error(responseData.message || 'Falha ao alterar a senha');
+  try {
+    await axiosInstance.post('/auth/change-password', data, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return {
+      success: true,
+      message: 'Senha alterada com sucesso'
+    };
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Falha ao alterar a senha');
   }
-
-  return {
-    success: true,
-    message: 'Senha alterada com sucesso'
-  };
 }; 

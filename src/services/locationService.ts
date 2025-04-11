@@ -1,3 +1,5 @@
+import { axiosInstance } from '../lib/axios';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333';
 
 export interface Location {
@@ -16,77 +18,61 @@ export interface CreateLocationRequest {
  * Gets all locations for the authenticated user
  */
 export const getLocations = async (accessToken: string): Promise<{ locations: Location[] }> => {
-  const response = await fetch(`${API_URL}/location`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Failed to fetch locations');
+  try {
+    const { data } = await axiosInstance.get<{ locations: Location[] }>('/location', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Failed to fetch locations');
   }
-
-  return response.json();
 };
 
 /**
  * Creates a new location for the authenticated user
  */
 export const createLocation = async (accessToken: string, data: CreateLocationRequest): Promise<Location> => {
-  const response = await fetch(`${API_URL}/location`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Failed to create location');
+  try {
+    const { data: responseData } = await axiosInstance.post<Location>('/location', data, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return responseData;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Failed to create location');
   }
-
-  return response.json();
 };
 
 /**
  * Sets a location as active
  */
 export const setActiveLocation = async (accessToken: string, locationId: string): Promise<Location> => {
-  const response = await fetch(`${API_URL}/location/${locationId}/active`, {
-    method: 'PATCH',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Failed to set active location');
+  try {
+    const { data } = await axiosInstance.patch<Location>(`/location/${locationId}/active`, {}, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Failed to set active location');
   }
-
-  return response.json();
 };
 
 /**
  * Deletes a location
  */
 export const deleteLocation = async (accessToken: string, locationId: string): Promise<void> => {
-  const response = await fetch(`${API_URL}/location/${locationId}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Failed to delete location');
+  try {
+    await axiosInstance.delete(`/location/${locationId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Failed to delete location');
   }
 }; 

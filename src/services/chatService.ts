@@ -1,3 +1,5 @@
+import { axiosInstance } from '../lib/axios';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333';
 
 // Chat session type
@@ -41,40 +43,32 @@ export interface UpdateChatMessageRequest {
  * Gets all chat sessions for the current user
  */
 export const getChatSessions = async (accessToken: string): Promise<ChatSession[]> => {
-  const response = await fetch(`${API_URL}/chat/sessions`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Falha ao obter sessões de chat');
+  try {
+    const { data } = await axiosInstance.get<ChatSession[]>('/chat/sessions', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Falha ao obter sessões de chat');
   }
-
-  return response.json();
 };
 
 /**
  * Gets a specific chat session by ID
  */
 export const getChatSession = async (accessToken: string, sessionId: string): Promise<ChatSession> => {
-  const response = await fetch(`${API_URL}/chat/sessions/${sessionId}`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Falha ao obter sessão de chat');
+  try {
+    const { data } = await axiosInstance.get<ChatSession>(`/chat/sessions/${sessionId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Falha ao obter sessão de chat');
   }
-
-  return response.json();
 };
 
 /**
@@ -82,49 +76,34 @@ export const getChatSession = async (accessToken: string, sessionId: string): Pr
  */
 export const createChatMessage = async (
   accessToken: string,
-  data: {
-    chatSessionId: string;
-    location: string;
-    temperature: string;
-    condition: string;
-    naturalResponse: string;
-  }
+  data: CreateChatMessageRequest
 ): Promise<ChatMessage> => {
-  const response = await fetch(`${API_URL}/chat`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Falha ao criar mensagem de chat');
+  try {
+    const { data: responseData } = await axiosInstance.post<ChatMessage>('/chat', data, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return responseData;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Falha ao criar mensagem de chat');
   }
-
-  return response.json();
 };
 
 /**
  * Gets a specific chat message by ID
  */
 export const getChatMessage = async (accessToken: string, messageId: string): Promise<ChatMessage> => {
-  const response = await fetch(`${API_URL}/chat/${messageId}`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Falha ao obter mensagem de chat');
+  try {
+    const { data } = await axiosInstance.get<ChatMessage>(`/chat/${messageId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Falha ao obter mensagem de chat');
   }
-
-  return response.json();
 };
 
 /**
@@ -133,45 +112,32 @@ export const getChatMessage = async (accessToken: string, messageId: string): Pr
 export const updateChatMessage = async (
   accessToken: string,
   messageId: string,
-  data: {
-    location?: string;
-    temperature?: string;
-    condition?: string;
-    naturalResponse?: string;
-  }
+  data: UpdateChatMessageRequest
 ): Promise<ChatMessage> => {
-  const response = await fetch(`${API_URL}/chat/${messageId}`, {
-    method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Falha ao atualizar mensagem de chat');
+  try {
+    const { data: responseData } = await axiosInstance.put<ChatMessage>(`/chat/${messageId}`, data, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return responseData;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Falha ao atualizar mensagem de chat');
   }
-
-  return response.json();
 };
 
 /**
  * Deletes a chat message
  */
 export const deleteChatMessage = async (accessToken: string, messageId: string): Promise<void> => {
-  const response = await fetch(`${API_URL}/chat/${messageId}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Falha ao excluir mensagem de chat');
+  try {
+    await axiosInstance.delete(`/chat/${messageId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Falha ao excluir mensagem de chat');
   }
 };
 
@@ -179,16 +145,13 @@ export const deleteChatMessage = async (accessToken: string, messageId: string):
  * Deletes a chat session
  */
 export const deleteChatSession = async (accessToken: string, sessionId: string): Promise<void> => {
-  const response = await fetch(`${API_URL}/chat/sessions/${sessionId}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Falha ao excluir sessão de chat');
+  try {
+    await axiosInstance.delete(`/chat/sessions/${sessionId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Falha ao excluir sessão de chat');
   }
 }; 

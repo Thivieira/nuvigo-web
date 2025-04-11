@@ -135,6 +135,7 @@ export default function Login() {
                   type={showPassword ? "text" : "password"}
                   {...register("password")}
                   placeholder="********"
+                  autoComplete="current-password"
                   aria-invalid={!!errors.password}
                   aria-describedby={errors.password ? "password-error" : undefined}
                 />

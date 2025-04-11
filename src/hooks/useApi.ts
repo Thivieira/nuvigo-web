@@ -3,9 +3,10 @@
 import { useAuth } from '@/contexts/auth-context';
 import { useCallback } from 'react';
 import useSWR from 'swr';
-import axiosInstance from '../lib/axios';
+import { axiosInstance } from '../lib/axios';
+import { AxiosRequestConfig } from 'axios';
 
-interface RequestOptions extends RequestInit {
+interface RequestOptions extends Omit<AxiosRequestConfig, 'url'> {
   requireAuth?: boolean;
 }
 
@@ -40,41 +41,48 @@ export function useApiOld() {
   const { tokens, refreshToken } = useAuth();
 
   const fetchWithAuth = useCallback(async (url: string, options: RequestOptions = {}) => {
-    const { requireAuth = true, ...fetchOptions } = options;
+    const { requireAuth = true, ...axiosOptions } = options;
 
-    const headers = new Headers(fetchOptions.headers);
+    const headers: Record<string, string> = {};
 
     if (requireAuth && tokens?.accessToken) {
-      headers.set('Authorization', `Bearer ${tokens.accessToken}`);
+      headers['Authorization'] = `Bearer ${tokens.accessToken}`;
     }
 
-    if (!headers.has('Content-Type')) {
-      headers.set('Content-Type', 'application/json');
+    if (!headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
     }
 
     try {
-      const response = await fetch(url, {
-        ...fetchOptions,
-        headers,
+      const response = await axiosInstance({
+        url,
+        ...axiosOptions,
+        headers: {
+          ...axiosOptions.headers,
+          ...headers,
+        },
       });
 
+      return response;
+    } catch (error: any) {
       // Handle token expiration
-      if (response.status === 401 && requireAuth) {
+      if (error.response?.status === 401 && requireAuth) {
         try {
           await refreshToken();
           // Retry the request with new token
-          headers.set('Authorization', `Bearer ${tokens?.accessToken}`);
-          return fetch(url, {
-            ...fetchOptions,
-            headers,
+          headers['Authorization'] = `Bearer ${tokens?.accessToken}`;
+          return axiosInstance({
+            url,
+            ...axiosOptions,
+            headers: {
+              ...axiosOptions.headers,
+              ...headers,
+            },
           });
-        } catch (error) {
+        } catch (refreshError) {
           throw new Error('Authentication failed');
         }
       }
-
-      return response;
-    } catch (error) {
       throw error;
     }
   }, [tokens, refreshToken]);

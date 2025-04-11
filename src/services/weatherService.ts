@@ -1,4 +1,4 @@
-import axiosInstance from '../lib/axios';
+import { axiosInstance } from '../lib/axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333';
 

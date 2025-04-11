@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import axiosInstance from '../lib/axios';
+import { axiosInstance } from '../lib/axios';
 
 interface FetcherConfig {
   url: string;

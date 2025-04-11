@@ -3,6 +3,7 @@ import HistoryItem from "./history-item"
 import { useEffect, useState } from "react"
 import { mockChatSessions, type ChatSession } from "@/mocks/chat-history"
 import { useToast } from "@/hooks/use-toast"
+import { axiosInstance } from "@/lib/axios"
 
 export default function HistoryTab() {
   const [sessions, setSessions] = useState<ChatSession[]>([])
@@ -11,10 +12,8 @@ export default function HistoryTab() {
 
   const fetchSessions = async () => {
     try {
-      const response = await fetch("/api/chat/sessions")
-      if (!response.ok) throw new Error("Failed to fetch sessions")
-      const data = await response.json()
-      setSessions(data.map((session: any) => ({
+      const { data } = await axiosInstance.get<ChatSession[]>("/api/chat/sessions")
+      setSessions(data.map(session => ({
         ...session,
         createdAt: new Date(session.createdAt)
       })))
@@ -33,14 +32,7 @@ export default function HistoryTab() {
 
   const handleDelete = async (sessionId: string) => {
     try {
-      const response = await fetch(`/api/chat/sessions/${sessionId}`, {
-        method: 'DELETE',
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to delete session')
-      }
-
+      await axiosInstance.delete(`/api/chat/sessions/${sessionId}`)
       setSessions(prev => prev.filter(session => session.id !== sessionId))
       toast({
         title: "Conversa excluída",

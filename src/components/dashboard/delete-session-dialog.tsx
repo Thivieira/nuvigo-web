@@ -12,6 +12,7 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog"
 import { Trash2 } from "lucide-react"
+import { axiosInstance } from "@/lib/axios"
 
 interface DeleteSessionDialogProps {
   sessionId: string
@@ -26,14 +27,7 @@ export default function DeleteSessionDialog({ sessionId, onConfirm, disabled }: 
   const handleDelete = async () => {
     try {
       setIsDeleting(true)
-      const response = await fetch(`/api/chat/sessions/${sessionId}`, {
-        method: 'DELETE',
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to delete session')
-      }
-
+      await axiosInstance.delete(`/api/chat/sessions/${sessionId}`)
       onConfirm()
       setOpen(false)
     } catch (error) {

@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, AuthTokens, LoginCredentials, RegisterCredentials, AuthResponse, ForgotPasswordCredentials, ResetPasswordCredentials } from '@/types/auth';
 import { setCookie, deleteCookie } from 'cookies-next';
+import { axiosInstance } from '@/lib/axios';
 
 interface AuthContextType {
   user: User | null;
@@ -19,8 +20,6 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333';
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -99,24 +98,14 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
   const fetchUserData = async (token: string) => {
     try {
       console.log('Fetching user data with token');
-      const response = await fetch(`${API_URL}/auth/me`, {
+      const { data: userData } = await axiosInstance.get<User>('/auth/me', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      if (response.ok) {
-        const userData = await response.json();
-        console.log('User data fetched successfully:', userData);
-        setUser(userData);
-        setIsAuthenticated(true);
-      } else {
-        console.error('Failed to fetch user data:', response.status);
-        // If token is invalid, clear everything but don't delete from storage
-        setUser(null);
-        setTokens(null);
-        setIsAuthenticated(false);
-      }
+      console.log('User data fetched successfully:', userData);
+      setUser(userData);
+      setIsAuthenticated(true);
     } catch (error) {
       console.error('Error fetching user data:', error);
       // If token is invalid, clear everything but don't delete from storage
@@ -155,49 +144,26 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
     try {
       console.log('Attempting login with:', credentials.email);
 
-      const response = await fetch(`${API_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      });
-
-      if (!response.ok) {
-        console.error('Login failed with status:', response.status);
-        throw new Error('Login failed');
-      }
-
-      const responseData = await response.json();
-      console.log('Login successful, received data:', responseData);
+      const { data: responseData } = await axiosInstance.post<AuthResponse>('/auth/login', credentials);
 
       // Check if the response has the expected structure
-      if (!responseData.accessToken) {
+      if (!responseData.tokens?.accessToken) {
         console.error('Invalid token structure received from server');
         throw new Error('Invalid token structure received from server');
       }
 
-      // Create the AuthResponse structure from the server response
-      const authResponse: AuthResponse = {
-        user: responseData.user,
-        tokens: {
-          accessToken: responseData.accessToken,
-          refreshToken: responseData.refreshToken
-        }
-      };
-
-      setUser(authResponse.user);
-      setTokens(authResponse.tokens);
+      setUser(responseData.user);
+      setTokens(responseData.tokens);
       setIsAuthenticated(true);
-      setCookieAndLocalStorage(authResponse.tokens);
+      setCookieAndLocalStorage(responseData.tokens);
 
       console.log('Auth state updated after login:', {
-        user: authResponse.user,
-        tokens: authResponse.tokens,
+        user: responseData.user,
+        tokens: responseData.tokens,
         isAuthenticated: true
       });
 
-      return authResponse;
+      return responseData;
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -206,39 +172,18 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
 
   const register = async (credentials: RegisterCredentials) => {
     try {
-      const response = await fetch(`${API_URL}/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      });
+      const { data: responseData } = await axiosInstance.post<AuthResponse>('/auth/register', credentials);
 
-      if (!response.ok) {
-        throw new Error('Registration failed');
-      }
-
-      const responseData = await response.json();
-
-      if (!responseData.accessToken) {
+      if (!responseData.tokens?.accessToken) {
         throw new Error('Invalid token structure received from server');
       }
 
-      // Create the AuthResponse structure from the server response
-      const authResponse: AuthResponse = {
-        user: responseData.user,
-        tokens: {
-          accessToken: responseData.accessToken,
-          refreshToken: responseData.refreshToken
-        }
-      };
-
-      setUser(authResponse.user);
-      setTokens(authResponse.tokens);
+      setUser(responseData.user);
+      setTokens(responseData.tokens);
       setIsAuthenticated(true);
-      setCookieAndLocalStorage(authResponse.tokens);
+      setCookieAndLocalStorage(responseData.tokens);
 
-      return authResponse;
+      return responseData;
     } catch (error) {
       console.error('Registration error:', error);
       throw error;
@@ -248,13 +193,10 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
   const logout = async () => {
     if (tokens?.refreshToken) {
       try {
-        await fetch(`${API_URL}/auth/logout`, {
-          method: 'POST',
+        await axiosInstance.post('/auth/logout', { refreshToken: tokens.refreshToken }, {
           headers: {
-            'Content-Type': 'application/json',
             Authorization: `Bearer ${tokens.accessToken}`,
           },
-          body: JSON.stringify({ refreshToken: tokens.refreshToken }),
         });
       } catch (error) {
         console.error('Logout error:', error);
@@ -265,171 +207,71 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
 
   const refreshToken = async (): Promise<AuthTokens> => {
     try {
-      const response = await fetch(`${API_URL}/auth/refresh`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ refreshToken: tokens?.refreshToken }),
+      const { data } = await axiosInstance.post<AuthTokens>('/auth/refresh', {
+        refreshToken: tokens?.refreshToken,
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to refresh token');
-      }
-
-      const responseData = await response.json();
-
-      if (!responseData.accessToken) {
-        throw new Error('Invalid token structure received from server');
-      }
-
-      const newTokens: AuthTokens = {
-        accessToken: responseData.accessToken,
-        refreshToken: responseData.refreshToken
-      };
-
-      setTokens(newTokens);
-      setIsAuthenticated(true);
-      setCookieAndLocalStorage(newTokens);
-
-      return newTokens;
+      setTokens(data);
+      setCookieAndLocalStorage(data);
+      return data;
     } catch (error) {
-      console.error('Error refreshing token:', error);
-      // Don't call handleLogout here, just clear the state
-      setUser(null);
-      setTokens(null);
-      setIsAuthenticated(false);
+      console.error('Token refresh error:', error);
+      handleLogout();
       throw error;
     }
   };
 
   const forgotPassword = async (credentials: ForgotPasswordCredentials) => {
     try {
-      console.log('Requesting password reset for email:', credentials.email);
-
-      const response = await fetch(`${API_URL}/auth/forgot-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error('Forgot password request failed:', data);
-        return {
-          success: false,
-          message: data.message || 'Falha ao solicitar redefinição de senha'
-        };
-      }
-
-      console.log('Password reset email sent successfully');
+      await axiosInstance.post('/auth/forgot-password', credentials);
       return {
         success: true,
-        message: 'Email de redefinição de senha enviado com sucesso'
+        message: 'Email de recuperação enviado com sucesso'
       };
-    } catch (error) {
-      console.error('Error in forgotPassword:', error);
-      return {
-        success: false,
-        message: 'Ocorreu um erro ao solicitar redefinição de senha'
-      };
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Falha ao enviar email de recuperação');
     }
   };
 
   const resetPassword = async (credentials: ResetPasswordCredentials) => {
     try {
-      console.log('Resetting password with token');
-
-      const response = await fetch(`${API_URL}/auth/reset-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error('Password reset failed:', data);
-        return {
-          success: false,
-          message: data.message || 'Falha ao redefinir a senha'
-        };
-      }
-
-      console.log('Password reset successful');
+      await axiosInstance.post('/auth/reset-password', credentials);
       return {
         success: true,
         message: 'Senha redefinida com sucesso'
       };
-    } catch (error) {
-      console.error('Error in resetPassword:', error);
-      return {
-        success: false,
-        message: 'Ocorreu um erro ao redefinir a senha'
-      };
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Falha ao redefinir a senha');
     }
   };
 
   const verifyEmail = async (credentials: { token: string }) => {
     try {
-      console.log('Verifying email with token');
-
-      const response = await fetch(`${API_URL}/auth/verify-email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error('Email verification failed:', data);
-        return {
-          success: false,
-          message: data.message || 'Falha na verificação do email'
-        };
-      }
-
-      console.log('Email verification successful');
+      await axiosInstance.post('/auth/verify-email', credentials);
       return {
         success: true,
         message: 'Email verificado com sucesso'
       };
-    } catch (error) {
-      console.error('Error in verifyEmail:', error);
-      return {
-        success: false,
-        message: 'Ocorreu um erro ao verificar o email'
-      };
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Falha na verificação do email');
     }
   };
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isLoading,
-        isAuthenticated,
-        tokens,
-        login,
-        register,
-        logout,
-        refreshToken,
-        forgotPassword,
-        resetPassword,
-        verifyEmail,
-      }}
-    >
-      {!isLoading && children}
-    </AuthContext.Provider>
-  );
+  const value = {
+    user,
+    isLoading,
+    isAuthenticated,
+    tokens,
+    login,
+    register,
+    logout,
+    refreshToken,
+    forgotPassword,
+    resetPassword,
+    verifyEmail,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
