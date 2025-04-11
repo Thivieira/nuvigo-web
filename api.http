@@ -101,18 +101,26 @@ Authorization: Bearer {{authToken}}
 
 ### Weather Endpoints ###
 
-### Get weather information
-GET {{baseUrl}}/weather?location=Rio%20de%20janeiro&query=How%20will%20it%20be%20on%20Friday%20afternoon?&language=en
+### Get current weather by location name
+GET {{baseUrl}}/weather/location?location=Rio%20de%20Janeiro
+Authorization: Bearer {{authToken}}
+
+### Get current weather by coordinates
+GET {{baseUrl}}/weather/location?lat=-22.9068&lon=-43.1729
+Authorization: Bearer {{authToken}}
+
+### Get weather information based on user query
+GET {{baseUrl}}/weather/query?location=Rio%20de%20Janeiro&query=How%20will%20it%20be%20on%20Friday%20afternoon?&language=en
 Authorization: Bearer {{authToken}}
 
 ### Location Management Endpoints ###
 
 ### Get all locations
-GET {{baseUrl}}/api/locations
+GET {{baseUrl}}/locations
 Authorization: Bearer {{authToken}}
 
 ### Add new location
-POST {{baseUrl}}/api/locations
+POST {{baseUrl}}/locations
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -121,11 +129,11 @@ Authorization: Bearer {{authToken}}
 }
 
 ### Set location as active
-PATCH {{baseUrl}}/api/locations/123e4567-e89b-12d3-a456-426614174000/active
+PATCH {{baseUrl}}/location/123e4567-e89b-12d3-a456-426614174000/active
 Authorization: Bearer {{authToken}}
 
 ### Delete location
-DELETE {{baseUrl}}/api/locations/123e4567-e89b-12d3-a456-426614174000
+DELETE {{baseUrl}}/locations/123e4567-e89b-12d3-a456-426614174000
 Authorization: Bearer {{authToken}}
 
 ### Chat Session Endpoints ###

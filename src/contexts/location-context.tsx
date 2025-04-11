@@ -1,8 +1,9 @@
 "use client"
 
-import { createContext, useContext, useState, ReactNode, useEffect } from "react"
+import { createContext, useContext, ReactNode } from "react"
 import { useAuth } from "./auth-context"
 import { Location, createLocation, deleteLocation, getLocations, setActiveLocation } from "@/services/locationService"
+import { useSwrApiWithError } from "@/hooks/useSwrApi"
 
 interface LocationContextType {
   activeLocation: string
@@ -18,73 +19,52 @@ const LocationContext = createContext<LocationContextType | undefined>(undefined
 
 export function LocationProvider({ children }: { children: ReactNode }) {
   const { tokens } = useAuth()
-  const [locations, setLocations] = useState<Location[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
 
-  // Fetch locations on mount and when access token changes
-  useEffect(() => {
-    if (tokens?.accessToken) {
-      fetchLocations()
+  const {
+    data: locationsData,
+    error,
+    isLoading,
+    mutate: mutateLocations
+  } = useSwrApiWithError<{ locations: Location[] }>(
+    tokens?.accessToken ? '/location' : null,
+    tokens?.accessToken,
+    {
+      refreshInterval: 300000, // 5 minutes
     }
-  }, [tokens?.accessToken])
+  )
 
-  const fetchLocations = async () => {
-    try {
-      setIsLoading(true)
-      setError(null)
-      const data = await getLocations(tokens!.accessToken)
-      setLocations(Array.isArray(data) ? data : [])
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch locations'))
-      setLocations([]) // Ensure locations is always an array
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const locations = locationsData?.locations || []
 
   const handleAddLocation = async (locationName: string) => {
     try {
-      setError(null)
       const newLocation = await createLocation(tokens!.accessToken, { name: locationName })
-      setLocations(prev => [...prev, newLocation])
+      await mutateLocations()
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to add location'))
-      throw err
+      throw err instanceof Error ? err : new Error('Failed to add location')
     }
   }
 
   const handleDeleteLocation = async (locationName: string) => {
     try {
-      setError(null)
       const locationToDelete = locations.find(loc => loc.name === locationName)
       if (!locationToDelete) return
 
       await deleteLocation(tokens!.accessToken, locationToDelete.id)
-      setLocations(prev => prev.filter(loc => loc.id !== locationToDelete.id))
+      await mutateLocations()
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to delete location'))
-      throw err
+      throw err instanceof Error ? err : new Error('Failed to delete location')
     }
   }
 
   const handleSetActiveLocation = async (locationName: string) => {
     try {
-      setError(null)
       const locationToActivate = locations.find(loc => loc.name === locationName)
       if (!locationToActivate) return
 
-      const updatedLocation = await setActiveLocation(tokens!.accessToken, locationToActivate.id)
-      setLocations(prev =>
-        prev.map(loc =>
-          loc.id === updatedLocation.id
-            ? updatedLocation
-            : { ...loc, isActive: false }
-        )
-      )
+      await setActiveLocation(tokens!.accessToken, locationToActivate.id)
+      await mutateLocations()
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to set active location'))
-      throw err
+      throw err instanceof Error ? err : new Error('Failed to set active location')
     }
   }
 

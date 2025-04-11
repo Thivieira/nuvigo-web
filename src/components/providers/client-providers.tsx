@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react';
 import { AuthProvider } from '@/contexts/auth-context';
+import { SwrProvider } from './swr-provider';
 
 interface ClientProvidersProps {
   children: ReactNode;
@@ -9,8 +10,10 @@ interface ClientProvidersProps {
 
 export function ClientProviders({ children }: ClientProvidersProps) {
   return (
-    <AuthProvider>
-      {children}
-    </AuthProvider>
+    <SwrProvider>
+      <AuthProvider>
+        {children}
+      </AuthProvider>
+    </SwrProvider>
   );
 } 

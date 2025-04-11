@@ -87,7 +87,7 @@ export default function AddLocationDialog({ onAddLocation }: AddLocationDialogPr
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit" disabled={!location.trim() || isLoading}>
+            <Button type="submit" className="cursor-pointer" disabled={!location.trim() || isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -15,9 +15,6 @@ const publicPaths = [
   '/android-chrome-192x192.png',
   '/apple-touch-icon.png',
   '/site.webmanifest',
-  '/api/auth/login',
-  '/api/auth/register',
-  '/api/auth/refresh',
 ];
 
 export function middleware(request: NextRequest) {
@@ -30,7 +27,7 @@ export function middleware(request: NextRequest) {
     if (path === '/' && pathname === '/') {
       return true;
     }
-    
+
     // For other paths, check for exact match or if pathname starts with path + '/'
     // This ensures that /dashboard doesn't match when checking for /
     return pathname === path || pathname.startsWith(path + '/');

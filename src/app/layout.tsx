@@ -29,7 +29,11 @@ export default function RootLayout({
         <ToastProvider />
         <ClientProviders>
           <LocationProvider>
-            {children}
+            <div className="min-h-screen flex flex-col">
+              <main className="flex-1">
+                {children}
+              </main>
+            </div>
           </LocationProvider>
         </ClientProviders>
       </body>

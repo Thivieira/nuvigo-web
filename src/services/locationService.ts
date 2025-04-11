@@ -15,8 +15,8 @@ export interface CreateLocationRequest {
 /**
  * Gets all locations for the authenticated user
  */
-export const getLocations = async (accessToken: string): Promise<Location[]> => {
-  const response = await fetch(`${API_URL}/api/locations`, {
+export const getLocations = async (accessToken: string): Promise<{ locations: Location[] }> => {
+  const response = await fetch(`${API_URL}/location`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
@@ -36,7 +36,7 @@ export const getLocations = async (accessToken: string): Promise<Location[]> => 
  * Creates a new location for the authenticated user
  */
 export const createLocation = async (accessToken: string, data: CreateLocationRequest): Promise<Location> => {
-  const response = await fetch(`${API_URL}/api/locations`, {
+  const response = await fetch(`${API_URL}/location`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
@@ -57,7 +57,7 @@ export const createLocation = async (accessToken: string, data: CreateLocationRe
  * Sets a location as active
  */
 export const setActiveLocation = async (accessToken: string, locationId: string): Promise<Location> => {
-  const response = await fetch(`${API_URL}/api/locations/${locationId}/active`, {
+  const response = await fetch(`${API_URL}/location/${locationId}/active`, {
     method: 'PATCH',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
@@ -77,7 +77,7 @@ export const setActiveLocation = async (accessToken: string, locationId: string)
  * Deletes a location
  */
 export const deleteLocation = async (accessToken: string, locationId: string): Promise<void> => {
-  const response = await fetch(`${API_URL}/api/locations/${locationId}`, {
+  const response = await fetch(`${API_URL}/location/${locationId}`, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${accessToken}`,

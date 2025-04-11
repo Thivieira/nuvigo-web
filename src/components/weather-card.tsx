@@ -3,8 +3,10 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Cloud, CloudRain, Thermometer, Wind, Droplets, ChevronDown, ChevronUp } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useCallback, useState } from "react"
 import { Button } from "@/components/ui/button"
+import Image from "next/image";
+import { getIcon } from "@/lib/get-icon";
 
 interface WeatherData {
   location: string
@@ -15,6 +17,7 @@ interface WeatherData {
   precipitation: string
   humidity: string
   wind: string
+  weatherCode: number
 }
 
 interface WeatherCardProps {
@@ -24,6 +27,19 @@ interface WeatherCardProps {
 
 export default function WeatherCard({ data, loading }: WeatherCardProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const [icon, setIcon] = useState<string | null>(null)
+
+  const getIconFromWeatherCode = useCallback(async () => {
+    if (data?.weatherCode) {
+      const icon = await getIcon(data.weatherCode)
+      setIcon(icon)
+    }
+  }, [data?.weatherCode])
+
+  useEffect(() => {
+    getIconFromWeatherCode()
+  }, [getIconFromWeatherCode])
+
 
   if (loading) {
     return (
@@ -48,6 +64,8 @@ export default function WeatherCard({ data, loading }: WeatherCardProps) {
 
   if (!data) return null
 
+
+
   return (
     <div>
       <Button
@@ -65,13 +83,13 @@ export default function WeatherCard({ data, loading }: WeatherCardProps) {
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex items-center justify-center bg-primary/10 h-24 w-24 rounded-full">
-                <Cloud className="h-12 w-12 text-primary" />
+                {icon && <Image src={`/weather-icons/${icon}`} alt="Weather Icon" width={80} height={80} />}
               </div>
 
               <div className="flex-1">
                 <h2 className="text-2xl font-bold">{data.location}</h2>
                 <div className="flex items-center gap-2">
-                  <span className="text-4xl font-bold">{data.temperature}°F</span>
+                  <span className="text-4xl font-bold">{data.temperature}°C</span>
                   <span className="text-muted-foreground">{data.condition}</span>
                 </div>
 
