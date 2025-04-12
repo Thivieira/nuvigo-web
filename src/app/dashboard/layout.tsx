@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useEffect } from "react"
 import { Logo } from "@/components/logo"
+import RecentConversations from "@/components/dashboard/recent-conversations"
 
 export default function DashboardLayout({
   children,
@@ -97,22 +98,7 @@ export default function DashboardLayout({
             error={error}
           />
         </div>
-        <div className="mb-6">
-          <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-            <History className="h-4 w-4" />
-            CONVERSAS RECENTES
-          </h3>
-          <div className="space-y-2">
-            <div className="p-2 rounded-md hover:bg-slate-100 cursor-pointer">
-              <p className="text-sm font-medium">Clima em São Paulo</p>
-              <p className="text-xs text-muted-foreground">Hoje, 10:30</p>
-            </div>
-            <div className="p-2 rounded-md hover:bg-slate-100 cursor-pointer">
-              <p className="text-sm font-medium">Previsão Rio de Janeiro</p>
-              <p className="text-xs text-muted-foreground">Ontem, 15:45</p>
-            </div>
-          </div>
-        </div>
+        <RecentConversations />
       </div>
       <div className="p-4 border-t">
         <Button

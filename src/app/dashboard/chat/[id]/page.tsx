@@ -38,8 +38,8 @@ export default function ChatSessionPage({ params }: ChatSessionPageProps) {
   // Transform messages to match ChatTab's expected format
   const initialMessages = session.chats.map(chat => ({
     id: chat.id,
-    role: 'user' as const, // Since we don't have role in the service type, default to user
-    content: chat.naturalResponse
+    role: chat.role as 'user' | 'assistant',
+    content: chat.message
   }))
 
   return (

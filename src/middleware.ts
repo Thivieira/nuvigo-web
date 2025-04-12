@@ -19,7 +19,6 @@ const publicPaths = [
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  console.log(`Middleware processing request for path: ${pathname}`);
 
   // Check if the path is public
   const isPublicPath = publicPaths.some(path => {
@@ -53,21 +52,16 @@ export function middleware(request: NextRequest) {
 
   try {
     // Verify the token is valid JSON and has the expected structure
-    console.log('Found auth_tokens cookie, attempting to parse');
     const tokenData = JSON.parse(tokenValue);
 
     // Check if the token has the required properties
     if (!tokenData || !tokenData.accessToken) {
-      console.log('Token missing accessToken property');
       throw new Error('Invalid token structure');
     }
-
-    console.log('Token validation successful, allowing access to:', pathname);
 
     // Allow the request to proceed
     return NextResponse.next();
   } catch (error) {
-    console.log('Error validating token:', error);
     // If token is invalid, redirect to login
     if (pathname !== '/login') {
       const loginUrl = new URL('/login', request.url);

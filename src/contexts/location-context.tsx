@@ -8,9 +8,9 @@ import { useSwrApiWithError } from "@/hooks/useSwrApi"
 interface LocationContextType {
   activeLocation: string
   savedLocations: string[]
-  setActiveLocation: (location: string) => void
-  handleAddLocation: (location: string) => void
-  handleDeleteLocation: (location: string) => void
+  setActiveLocation: (location: string) => Promise<void>
+  handleAddLocation: (location: string) => Promise<void>
+  handleDeleteLocation: (location: string) => Promise<void>
   isLoading: boolean
   error: Error | null
 }

@@ -13,12 +13,24 @@ export interface ChatSession {
 export interface ChatMessage {
   id: string;
   chatSessionId: string;
-  location: string;
-  temperature: string;
-  condition: string;
-  naturalResponse: string;
+  message: string;
+  role: 'user' | 'assistant';
+  turn: number;
   createdAt: string;
   updatedAt: string;
+  userId: string;
+  metadata?: {
+    low?: string;
+    high?: string;
+    humidity?: string;
+    location?: string;
+    condition?: string;
+    windSpeed?: string;
+    temperature?: string;
+    weatherCode?: string;
+    precipitation?: string;
+    currentTime?: string;
+  };
 }
 
 // Create chat message request type
