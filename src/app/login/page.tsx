@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Cloud, Eye, EyeOff } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 
 // Define the validation schema
 const loginSchema = z.object({
@@ -22,7 +22,7 @@ const loginSchema = z.object({
 // Type for the form data
 type LoginFormData = z.infer<typeof loginSchema>
 
-export default function Login() {
+function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { login, isAuthenticated } = useAuth()
@@ -178,6 +178,18 @@ export default function Login() {
         </form>
       </Card>
     </div>
+  )
+}
+
+export default function Login() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="animate-pulse">Carregando...</div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   )
 }
 

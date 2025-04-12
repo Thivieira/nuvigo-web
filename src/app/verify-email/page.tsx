@@ -2,13 +2,13 @@
 
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Cloud } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 
-export default function VerifyEmail() {
+function VerifyEmailForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { verifyEmail } = useAuth()
@@ -100,5 +100,17 @@ export default function VerifyEmail() {
         </CardFooter>
       </Card>
     </div>
+  )
+}
+
+export default function VerifyEmail() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="animate-pulse">Carregando...</div>
+      </div>
+    }>
+      <VerifyEmailForm />
+    </Suspense>
   )
 } 

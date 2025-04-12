@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Cloud } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 
 // Define the validation schema
 const resetPasswordSchema = z.object({
@@ -25,7 +25,7 @@ const resetPasswordSchema = z.object({
 // Type for the form data
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>
 
-export default function ResetPassword() {
+function ResetPasswordForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { resetPassword } = useAuth()
@@ -170,5 +170,17 @@ export default function ResetPassword() {
         </form>
       </Card>
     </div>
+  )
+}
+
+export default function ResetPassword() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="animate-pulse">Carregando...</div>
+      </div>
+    }>
+      <ResetPasswordForm />
+    </Suspense>
   )
 } 
