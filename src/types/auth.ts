@@ -33,6 +33,12 @@ export interface AuthResponse {
   tokens: AuthTokens;
 }
 
+export interface ServerAuthResponse {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+}
+
 export interface AuthError {
   message: string;
   status: number;

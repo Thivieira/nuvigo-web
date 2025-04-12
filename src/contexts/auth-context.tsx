@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, AuthTokens, LoginCredentials, RegisterCredentials, AuthResponse, ForgotPasswordCredentials, ResetPasswordCredentials } from '@/types/auth';
+import { User, AuthTokens, LoginCredentials, RegisterCredentials, AuthResponse, ForgotPasswordCredentials, ResetPasswordCredentials, ServerAuthResponse } from '@/types/auth';
 import { setCookie, deleteCookie } from 'cookies-next';
 import { axiosInstance } from '@/lib/axios';
 
@@ -144,26 +144,29 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
     try {
       console.log('Attempting login with:', credentials.email);
 
-      const { data: responseData } = await axiosInstance.post<AuthResponse>('/auth/login', credentials);
+      const { data: responseData } = await axiosInstance.post<ServerAuthResponse>('/auth/login', credentials);
 
-      // Check if the response has the expected structure
-      if (!responseData.tokens?.accessToken) {
-        console.error('Invalid token structure received from server');
-        throw new Error('Invalid token structure received from server');
-      }
+      // Transform the response to match the expected structure
+      const transformedResponse: AuthResponse = {
+        user: responseData.user,
+        tokens: {
+          accessToken: responseData.accessToken,
+          refreshToken: responseData.refreshToken
+        }
+      };
 
-      setUser(responseData.user);
-      setTokens(responseData.tokens);
+      setUser(transformedResponse.user);
+      setTokens(transformedResponse.tokens);
       setIsAuthenticated(true);
-      setCookieAndLocalStorage(responseData.tokens);
+      setCookieAndLocalStorage(transformedResponse.tokens);
 
       console.log('Auth state updated after login:', {
-        user: responseData.user,
-        tokens: responseData.tokens,
+        user: transformedResponse.user,
+        tokens: transformedResponse.tokens,
         isAuthenticated: true
       });
 
-      return responseData;
+      return transformedResponse;
     } catch (error: any) {
       console.error('Login error:', error);
       // Handle the specific error format from the server
@@ -176,18 +179,23 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
 
   const register = async (credentials: RegisterCredentials) => {
     try {
-      const { data: responseData } = await axiosInstance.post<AuthResponse>('/auth/register', credentials);
+      const { data: responseData } = await axiosInstance.post<ServerAuthResponse>('/auth/register', credentials);
 
-      if (!responseData.tokens?.accessToken) {
-        throw new Error('Invalid token structure received from server');
-      }
+      // Transform the response to match the expected structure
+      const transformedResponse: AuthResponse = {
+        user: responseData.user,
+        tokens: {
+          accessToken: responseData.accessToken,
+          refreshToken: responseData.refreshToken
+        }
+      };
 
-      setUser(responseData.user);
-      setTokens(responseData.tokens);
+      setUser(transformedResponse.user);
+      setTokens(transformedResponse.tokens);
       setIsAuthenticated(true);
-      setCookieAndLocalStorage(responseData.tokens);
+      setCookieAndLocalStorage(transformedResponse.tokens);
 
-      return responseData;
+      return transformedResponse;
     } catch (error) {
       console.error('Registration error:', error);
       throw error;

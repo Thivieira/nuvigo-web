@@ -76,9 +76,13 @@ export default function Login() {
       // The redirection will be handled by the useEffect above
     } catch (err: any) {
       console.error('Login failed:', err)
-      // Handle both string errors and error objects
-      const errorMessage = err.message || err.response?.data?.error || 'Email ou senha inválidos'
-      setError(errorMessage)
+      // Check if it's a server error (network error or 5xx status)
+      if (err.response?.status >= 500) {
+        setError('Servidor indisponível no momento. Por favor, tente novamente mais tarde.')
+      } else {
+        // For other errors (like 401, 403), show invalid credentials message
+        setError('Credenciais inválidas. Por favor, tente novamente.')
+      }
     } finally {
       setIsLoggingIn(false)
     }
