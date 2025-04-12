@@ -18,11 +18,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (authTokenCookie) {
           try {
             const parsedToken = JSON.parse(authTokenCookie.toString());
-            console.log('Parsed token:', parsedToken);
 
             // Validate the token structure
             if (parsedToken && parsedToken.accessToken) {
-              console.log('Found valid auth token in cookie:', parsedToken);
               setInitialAuthState(parsedToken);
             } else {
               console.error('Invalid token structure in cookie');
@@ -33,8 +31,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setInitialAuthState(null);
           }
         } else {
-          console.log('No auth token found in cookie, checking localStorage');
-
           // If no cookie, try localStorage (client-side only)
           if (typeof window !== 'undefined') {
             const storedTokens = localStorage.getItem('auth_tokens');
@@ -42,7 +38,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               try {
                 const parsedTokens = JSON.parse(storedTokens);
                 if (parsedTokens && parsedTokens.accessToken) {
-                  console.log('Found valid auth token in localStorage:', parsedTokens);
                   setInitialAuthState(parsedTokens);
                 } else {
                   console.error('Invalid token structure in localStorage');
@@ -53,7 +48,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setInitialAuthState(null);
               }
             } else {
-              console.log('No auth token found in localStorage');
               setInitialAuthState(null);
             }
           } else {
@@ -75,8 +69,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   if (!isInitialized) {
     return null;
   }
-
-  console.log('Rendering ClientAuthProvider with initialAuthState:', initialAuthState);
 
   return (
     <ClientAuthProvider initialAuthState={initialAuthState}>

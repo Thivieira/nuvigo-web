@@ -43,7 +43,6 @@ export default function Login() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      console.log('User is authenticated, redirecting to dashboard');
       const redirectTo = searchParams.get('from') || '/dashboard'
       router.push(redirectTo)
     }
@@ -68,10 +67,8 @@ export default function Login() {
       setError(null)
       setSuccess(null)
       setIsLoggingIn(true)
-      console.log('Submitting login form with email:', data.email);
 
       const response = await login(data)
-      console.log('Login successful, response:', response);
 
       // The redirection will be handled by the useEffect above
     } catch (err: any) {
@@ -116,6 +113,7 @@ export default function Login() {
                 id="email"
                 type="email"
                 placeholder="m@exemplo.com"
+                autoComplete="email"
                 {...register("email")}
                 aria-invalid={!!errors.email}
                 aria-describedby={errors.email ? "email-error" : undefined}

@@ -32,20 +32,10 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
   const [tokens, setTokens] = useState<AuthTokens | null>(initialAuthState);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!initialAuthState?.accessToken);
 
-  // Log the initial state for debugging
-  useEffect(() => {
-    console.log('AuthProvider initialized with:', {
-      initialAuthState,
-      tokens,
-      isAuthenticated
-    });
-  }, [initialAuthState, tokens, isAuthenticated]);
-
   useEffect(() => {
     const initializeAuth = async () => {
       try {
         if (initialAuthState?.accessToken) {
-          console.log('Initializing auth with provided tokens:', initialAuthState);
           setTokens(initialAuthState);
           await fetchUserData(initialAuthState.accessToken);
         } else {
@@ -55,12 +45,10 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
             try {
               const parsedTokens = JSON.parse(storedTokens);
               if (parsedTokens?.accessToken) {
-                console.log('Found valid tokens in localStorage:', parsedTokens);
                 setTokens(parsedTokens);
                 // Fetch user data
                 await fetchUserData(parsedTokens.accessToken);
               } else {
-                console.log('Invalid token structure in localStorage');
                 // Don't call handleLogout here, just clear the state
                 setUser(null);
                 setTokens(null);
@@ -74,7 +62,6 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
               setIsAuthenticated(false);
             }
           } else {
-            console.log('No tokens found in localStorage');
             // Don't call handleLogout here, just clear the state
             setUser(null);
             setTokens(null);
@@ -97,13 +84,11 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
 
   const fetchUserData = async (token: string) => {
     try {
-      console.log('Fetching user data with token');
       const { data: userData } = await axiosInstance.get<User>('/auth/me', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log('User data fetched successfully:', userData);
       setUser(userData);
       setIsAuthenticated(true);
     } catch (error) {
@@ -116,7 +101,6 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
   };
 
   const handleLogout = () => {
-    console.log('Logging out user');
     setUser(null);
     setTokens(null);
     setIsAuthenticated(false);
@@ -126,7 +110,6 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
 
   const setCookieAndLocalStorage = (tokens: AuthTokens) => {
     try {
-      console.log('Setting auth tokens in localStorage and cookies:', tokens);
       localStorage.setItem('auth_tokens', JSON.stringify(tokens));
       setCookie('auth_tokens', JSON.stringify(tokens), {
         maxAge: 86400, // 1 day
@@ -142,8 +125,6 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
 
   const login = async (credentials: LoginCredentials) => {
     try {
-      console.log('Attempting login with:', credentials.email);
-
       const { data: responseData } = await axiosInstance.post<ServerAuthResponse>('/auth/login', credentials);
 
       // Transform the response to match the expected structure
@@ -159,12 +140,6 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
       setTokens(transformedResponse.tokens);
       setIsAuthenticated(true);
       setCookieAndLocalStorage(transformedResponse.tokens);
-
-      console.log('Auth state updated after login:', {
-        user: transformedResponse.user,
-        tokens: transformedResponse.tokens,
-        isAuthenticated: true
-      });
 
       return transformedResponse;
     } catch (error: any) {

@@ -33,7 +33,6 @@ export default function VerifyEmail() {
 
   const verifyEmailToken = async (token: string) => {
     try {
-      console.log('Verifying email with token')
       const result = await verifyEmail({ token })
 
       if (result.success) {

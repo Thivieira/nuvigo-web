@@ -44,7 +44,6 @@ export default function ForgotPassword() {
     try {
       setIsSubmitting(true)
       setMessage(null)
-      console.log('Submitting forgot password form with email:', data.email)
 
       const result = await forgotPassword({ email: data.email })
 

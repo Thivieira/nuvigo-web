@@ -72,7 +72,6 @@ export default function ResetPassword() {
     try {
       setIsSubmitting(true)
       setMessage(null)
-      console.log('Submitting reset password form')
 
       const result = await resetPassword({
         token,

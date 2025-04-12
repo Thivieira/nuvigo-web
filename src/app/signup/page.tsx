@@ -146,6 +146,7 @@ export default function Signup() {
                 id="email"
                 type="email"
                 placeholder="m@exemplo.com"
+                autoComplete="email"
                 {...register("email")}
                 aria-invalid={!!errors.email}
                 aria-describedby={errors.email ? "email-error" : undefined}
@@ -159,6 +160,8 @@ export default function Signup() {
               <Input
                 id="password"
                 type="password"
+                placeholder="********"
+                autoComplete="new-password"
                 {...register("password")}
                 aria-invalid={!!errors.password}
                 aria-describedby={errors.password ? "password-error" : undefined}
@@ -172,6 +175,8 @@ export default function Signup() {
               <Input
                 id="confirmPassword"
                 type="password"
+                placeholder="********"
+                autoComplete="new-password"
                 {...register("confirmPassword")}
                 aria-invalid={!!errors.confirmPassword}
                 aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
