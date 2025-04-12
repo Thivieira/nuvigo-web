@@ -12,10 +12,10 @@ export default function HistoryTab() {
 
   const fetchSessions = async () => {
     try {
-      const { data } = await axiosInstance.get<ChatSession[]>("/chat/sessions")
+      const { data } = await axiosInstance.get<ChatSession[]>("/session")
       setSessions(data.map(session => ({
         ...session,
-        createdAt: new Date(session.createdAt)
+        createdAt: session.createdAt
       })))
     } catch (error) {
       console.error("Error fetching chat sessions:", error)
@@ -32,7 +32,7 @@ export default function HistoryTab() {
 
   const handleDelete = async (sessionId: string) => {
     try {
-      await axiosInstance.delete(`/chat/sessions/${sessionId}`)
+      await axiosInstance.delete(`/session/${sessionId}`)
       setSessions(prev => prev.filter(session => session.id !== sessionId))
       toast({
         title: "Conversa excluída",

@@ -1,13 +1,12 @@
 import { axiosInstance } from '../lib/axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333';
-
 // Chat session type
 export interface ChatSession {
   id: string;
   title: string;
   createdAt: string;
   updatedAt: string;
+  chats?: ChatMessage[];
 }
 
 // Chat message type
@@ -44,7 +43,7 @@ export interface UpdateChatMessageRequest {
  */
 export const getChatSessions = async (accessToken: string): Promise<ChatSession[]> => {
   try {
-    const { data } = await axiosInstance.get<ChatSession[]>('/chat/sessions', {
+    const { data } = await axiosInstance.get<ChatSession[]>('/session', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -60,7 +59,7 @@ export const getChatSessions = async (accessToken: string): Promise<ChatSession[
  */
 export const getChatSession = async (accessToken: string, sessionId: string): Promise<ChatSession> => {
   try {
-    const { data } = await axiosInstance.get<ChatSession>(`/chat/sessions/${sessionId}`, {
+    const { data } = await axiosInstance.get<ChatSession>(`/session/${sessionId}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -146,7 +145,7 @@ export const deleteChatMessage = async (accessToken: string, messageId: string):
  */
 export const deleteChatSession = async (accessToken: string, sessionId: string): Promise<void> => {
   try {
-    await axiosInstance.delete(`/chat/sessions/${sessionId}`, {
+    await axiosInstance.delete(`/session/${sessionId}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

@@ -2,12 +2,13 @@
 
 import { notFound } from "next/navigation"
 import ChatTab from "@/components/dashboard/chat-tab"
-import { mockChatSessions } from "@/mocks/chat-history"
-import { useEffect, useState } from "react"
+import { useEffect, useState, use } from "react"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { axiosInstance } from "@/lib/axios"
+import { ChatSkeleton } from "@/components/dashboard/chat-skeleton"
+import { useChatSession } from "@/hooks/useChat"
 
 interface ChatMessage {
   id: string
@@ -42,14 +43,14 @@ interface ChatSession {
 }
 
 interface ChatSessionPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 async function getChatSession(id: string): Promise<ChatSession> {
   try {
-    const response = await axiosInstance.get(`/chat/sessions/${id}`);
+    const response = await axiosInstance.get(`/session/${id}/chats`);
     return response.data;
   } catch (error) {
     console.error('Error fetching chat session:', error);
@@ -59,21 +60,61 @@ async function getChatSession(id: string): Promise<ChatSession> {
 
 export default function ChatSessionPage({ params }: ChatSessionPageProps) {
   const router = useRouter()
-  const [session, setSession] = useState<ChatSession | null>(null)
+  const { id } = use(params)
 
-  useEffect(() => {
-    const loadSession = async () => {
-      const data = await getChatSession(params.id)
-      if (!data) {
-        notFound()
-      }
-      setSession(data)
-    }
-    loadSession()
-  }, [params.id])
+  const { data: session, isLoading } = useChatSession(id)
+
+  // useEffect(() => {
+  //   let isMounted = true
+
+  //   const loadSession = async () => {
+  //     try {
+  //       const data = await getChatSession(id)
+  //       if (isMounted) {
+  //         if (!data) {
+  //           notFound()
+  //         }
+  //         setSession(data)
+  //       }
+  //     } catch (error) {
+  //       console.error('Failed to load chat session:', error)
+  //       if (isMounted) {
+  //         notFound()
+  //       }
+  //     } finally {
+  //       if (isMounted) {
+  //         setIsLoading(false)
+  //       }
+  //     }
+  //   }
+
+  //   loadSession()
+
+  //   return () => {
+  //     isMounted = false
+  //   }
+  // }, [id])
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="mb-4">
+          <Button
+            variant="ghost"
+            className="flex items-center gap-2 cursor-pointer"
+            onClick={() => router.push('/dashboard')}
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Voltar para o Dashboard
+          </Button>
+        </div>
+        <ChatSkeleton />
+      </div>
+    )
+  }
 
   if (!session) {
-    return null // or a loading state
+    return null
   }
 
   // Get the location from the first user message's metadata
