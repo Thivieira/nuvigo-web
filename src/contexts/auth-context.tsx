@@ -35,42 +35,34 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
   useEffect(() => {
     const initializeAuth = async () => {
       try {
+        // First check if we have initial state from the server
         if (initialAuthState?.accessToken) {
           setTokens(initialAuthState);
           await fetchUserData(initialAuthState.accessToken);
-        } else {
-          // Check for stored tokens on mount
-          const storedTokens = localStorage.getItem('auth_tokens');
-          if (storedTokens) {
-            try {
-              const parsedTokens = JSON.parse(storedTokens);
-              if (parsedTokens?.accessToken) {
-                setTokens(parsedTokens);
-                // Fetch user data
-                await fetchUserData(parsedTokens.accessToken);
-              } else {
-                // Don't call handleLogout here, just clear the state
-                setUser(null);
-                setTokens(null);
-                setIsAuthenticated(false);
-              }
-            } catch (error) {
-              console.error('Error parsing stored tokens:', error);
-              // Don't call handleLogout here, just clear the state
-              setUser(null);
-              setTokens(null);
-              setIsAuthenticated(false);
+          return;
+        }
+
+        // Then check localStorage for tokens
+        const storedTokens = localStorage.getItem('auth_tokens');
+        if (storedTokens) {
+          try {
+            const parsedTokens = JSON.parse(storedTokens);
+            if (parsedTokens?.accessToken) {
+              setTokens(parsedTokens);
+              await fetchUserData(parsedTokens.accessToken);
+              return;
             }
-          } else {
-            // Don't call handleLogout here, just clear the state
-            setUser(null);
-            setTokens(null);
-            setIsAuthenticated(false);
+          } catch (error) {
+            console.error('Error parsing stored tokens:', error);
           }
         }
+
+        // If we get here, we're not authenticated
+        setUser(null);
+        setTokens(null);
+        setIsAuthenticated(false);
       } catch (error) {
         console.error('Error initializing auth:', error);
-        // Don't call handleLogout here, just clear the state
         setUser(null);
         setTokens(null);
         setIsAuthenticated(false);
@@ -93,10 +85,8 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
       setIsAuthenticated(true);
     } catch (error) {
       console.error('Error fetching user data:', error);
-      // If token is invalid, clear everything but don't delete from storage
-      setUser(null);
-      setTokens(null);
-      setIsAuthenticated(false);
+      // If token is invalid, clear everything
+      handleLogout();
     }
   };
 

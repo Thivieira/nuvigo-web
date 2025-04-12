@@ -18,23 +18,23 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const router = useRouter()
-  const { user, logout, isAuthenticated } = useAuth()
+  const { user, logout, isAuthenticated, isLoading } = useAuth()
   const {
     activeLocation,
     savedLocations,
     setActiveLocation,
     handleAddLocation,
     handleDeleteLocation,
-    isLoading,
+    isLoading: isLocationLoading,
     error
   } = useLocation()
 
-  // Redirect if not authenticated
+  // Only redirect if not authenticated and not loading
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isLoading && !isAuthenticated) {
       router.push('/login')
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated, isLoading, router])
 
   const handleLogout = async () => {
     try {
@@ -93,7 +93,7 @@ export default function DashboardLayout({
             onLocationChange={setActiveLocation}
             onAddLocation={handleAddLocation}
             onDeleteLocation={handleDeleteLocation}
-            isLoading={isLoading}
+            isLoading={isLocationLoading}
             error={error}
           />
         </div>

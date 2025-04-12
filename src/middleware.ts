@@ -42,11 +42,13 @@ export function middleware(request: NextRequest) {
   const tokenValue = tokenCookie?.value;
 
   if (!tokenValue) {
-    console.log('No auth_tokens cookie found, redirecting to login');
-    // Redirect to login if no token is present
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('from', pathname);
-    return NextResponse.redirect(loginUrl);
+    // Only redirect to login if we're not already on the login page
+    if (pathname !== '/login') {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('from', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    return NextResponse.next();
   }
 
   try {
@@ -63,18 +65,16 @@ export function middleware(request: NextRequest) {
     console.log('Token validation successful, allowing access to:', pathname);
 
     // Allow the request to proceed
-    const response = NextResponse.next();
-
-    // Don't modify the cookie here, as it might interfere with the client-side auth state
-    // Just let the client handle the auth state
-
-    return response;
+    return NextResponse.next();
   } catch (error) {
     console.log('Error validating token:', error);
     // If token is invalid, redirect to login
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('from', pathname);
-    return NextResponse.redirect(loginUrl);
+    if (pathname !== '/login') {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('from', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    return NextResponse.next();
   }
 }
 
