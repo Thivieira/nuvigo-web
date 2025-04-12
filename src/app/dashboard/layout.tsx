@@ -84,7 +84,7 @@ export default function DashboardLayout({
           </div>
         </div>
         <div className="mb-6">
-          <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+          <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2 cursor-default">
             <MapPin className="h-4 w-4" />
             LOCALIZAÇÕES SALVAS
           </h3>

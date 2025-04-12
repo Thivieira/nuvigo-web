@@ -10,7 +10,7 @@ export default function RecentConversations() {
   if (isLoadingSessions) {
     return (
       <div className="mb-6">
-        <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+        <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2 cursor-default">
           <History className="h-4 w-4" />
           CONVERSAS RECENTES
         </h3>
@@ -25,7 +25,7 @@ export default function RecentConversations() {
 
   return (
     <div className="mb-6">
-      <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+      <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2 cursor-default">
         <History className="h-4 w-4" />
         CONVERSAS RECENTES
       </h3>
