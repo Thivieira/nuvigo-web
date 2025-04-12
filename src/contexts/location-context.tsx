@@ -2,7 +2,7 @@
 
 import { createContext, useContext, ReactNode } from "react"
 import { useAuth } from "./auth-context"
-import { Location, createLocation, deleteLocation, getLocations, setActiveLocation } from "@/services/locationService"
+import { Location, createLocation, deleteLocation, setActiveLocation } from "@/services/locationService"
 import { useSwrApiWithError } from "@/hooks/useSwrApi"
 
 interface LocationContextType {
@@ -37,7 +37,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
 
   const handleAddLocation = async (locationName: string) => {
     try {
-      const newLocation = await createLocation(tokens!.accessToken, { name: locationName })
+      await createLocation(tokens!.accessToken, { name: locationName })
       await mutateLocations()
     } catch (err) {
       throw err instanceof Error ? err : new Error('Failed to add location')

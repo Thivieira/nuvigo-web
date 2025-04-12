@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import { User, AuthTokens, LoginCredentials, RegisterCredentials, AuthResponse, ForgotPasswordCredentials, ResetPasswordCredentials, ServerAuthResponse } from '@/types/auth';
 import { setCookie, deleteCookie } from 'cookies-next';
 import { axiosInstance } from '@/lib/axios';
@@ -26,11 +26,44 @@ interface AuthProviderProps {
   initialAuthState?: AuthTokens | null;
 }
 
+interface ApiError {
+  response?: {
+    data?: {
+      error?: string;
+      message?: string;
+    };
+  };
+}
+
 export function AuthProvider({ children, initialAuthState = null }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [tokens, setTokens] = useState<AuthTokens | null>(initialAuthState);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!initialAuthState?.accessToken);
+
+  const handleLogout = useCallback(() => {
+    setUser(null);
+    setTokens(null);
+    setIsAuthenticated(false);
+    localStorage.removeItem('auth_tokens');
+    deleteCookie('auth_tokens', { path: '/' });
+  }, []);
+
+  const fetchUserData = useCallback(async (token: string) => {
+    try {
+      const { data: userData } = await axiosInstance.get<User>('/auth/me', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setUser(userData);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      // If token is invalid, clear everything
+      handleLogout();
+    }
+  }, [handleLogout]);
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -72,31 +105,7 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
     };
 
     initializeAuth();
-  }, [initialAuthState]);
-
-  const fetchUserData = async (token: string) => {
-    try {
-      const { data: userData } = await axiosInstance.get<User>('/auth/me', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setUser(userData);
-      setIsAuthenticated(true);
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      // If token is invalid, clear everything
-      handleLogout();
-    }
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-    setTokens(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem('auth_tokens');
-    deleteCookie('auth_tokens', { path: '/' });
-  };
+  }, [initialAuthState, fetchUserData]);
 
   const setCookieAndLocalStorage = (tokens: AuthTokens) => {
     try {
@@ -132,11 +141,11 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
       setCookieAndLocalStorage(transformedResponse.tokens);
 
       return transformedResponse;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login error:', error);
-      // Handle the specific error format from the server
-      if (error.response?.data?.error) {
-        throw new Error(error.response.data.error);
+      const apiError = error as ApiError;
+      if (apiError.response?.data?.error) {
+        throw new Error(apiError.response.data.error);
       }
       throw error;
     }
@@ -205,8 +214,9 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
         success: true,
         message: 'Email de recuperação enviado com sucesso'
       };
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Falha ao enviar email de recuperação');
+    } catch (error: unknown) {
+      const apiError = error as ApiError;
+      throw new Error(apiError.response?.data?.message || 'Falha ao enviar email de recuperação');
     }
   };
 
@@ -217,8 +227,9 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
         success: true,
         message: 'Senha redefinida com sucesso'
       };
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Falha ao redefinir a senha');
+    } catch (error: unknown) {
+      const apiError = error as ApiError;
+      throw new Error(apiError.response?.data?.message || 'Falha ao redefinir a senha');
     }
   };
 
@@ -229,8 +240,9 @@ export function AuthProvider({ children, initialAuthState = null }: AuthProvider
         success: true,
         message: 'Email verificado com sucesso'
       };
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Falha na verificação do email');
+    } catch (error: unknown) {
+      const apiError = error as ApiError;
+      throw new Error(apiError.response?.data?.message || 'Falha na verificação do email');
     }
   };
 

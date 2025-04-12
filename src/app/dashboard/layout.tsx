@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Cloud, LogOut, Menu, MapPin, History } from "lucide-react"
+import { LogOut, Menu, MapPin, History } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import SavedLocations from "@/components/saved-locations"
 import { useAuth } from "@/contexts/auth-context"

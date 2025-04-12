@@ -1,8 +1,6 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { MapPin, Loader2 } from "lucide-react"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import AddLocationDialog from "./add-location-dialog"
 import DeleteLocationDialog from "./delete-location-dialog"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -12,8 +10,8 @@ interface SavedLocationsProps {
   locations: string[]
   activeLocation: string
   onLocationChange: (location: string) => void
-  onAddLocation?: (location: string) => void
-  onDeleteLocation?: (location: string) => void
+  onAddLocation?: (location: string) => Promise<void>
+  onDeleteLocation?: (location: string) => Promise<void>
   isLoading?: boolean
   error?: Error | null
 }
@@ -22,8 +20,8 @@ export default function SavedLocations({
   locations,
   activeLocation,
   onLocationChange,
-  onAddLocation = () => { },
-  onDeleteLocation = () => { },
+  onAddLocation = async () => { },
+  onDeleteLocation = async () => { },
   isLoading = false,
   error = null
 }: SavedLocationsProps) {
@@ -49,23 +47,26 @@ export default function SavedLocations({
   return (
     <div className="space-y-1 w-full">
       {locations.map((location) => (
-        <div key={location} className="flex items-center gap-1">
-          <Button
-            variant={activeLocation === location ? "secondary" : "ghost"}
-            className="flex-1 justify-start gap-2 cursor-pointer"
+        <div
+          key={location}
+          className={`flex items-center justify-between p-2 rounded-md cursor-pointer ${activeLocation === location
+            ? 'bg-primary text-primary-foreground'
+            : 'hover:bg-slate-100'
+            }`}
+        >
+          <div
+            className="flex items-center gap-2 flex-1"
             onClick={() => onLocationChange(location)}
           >
             <MapPin className="h-4 w-4" />
-            {location}
-          </Button>
+            <span className="text-sm">{location}</span>
+          </div>
           <DeleteLocationDialog
             location={location}
-            onConfirm={() => onDeleteLocation(location)}
-            disabled={locations.length <= 1}
+            onConfirm={async () => await onDeleteLocation(location)}
           />
         </div>
       ))}
-
       <AddLocationDialog onAddLocation={onAddLocation} />
     </div>
   )

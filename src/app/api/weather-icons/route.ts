@@ -8,7 +8,7 @@ export async function GET() {
     const files = fs.readdirSync(iconsDir);
 
     return NextResponse.json({ files });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to read weather icons directory' },
       { status: 500 }

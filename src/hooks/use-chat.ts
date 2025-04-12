@@ -80,7 +80,7 @@ export function useChat({
         }
 
         const decoder = new TextDecoder();
-        let assistantMessage: Message = {
+        const assistantMessage: Message = {
           id: Date.now().toString(),
           role: 'assistant',
           content: '',

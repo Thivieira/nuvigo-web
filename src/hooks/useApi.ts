@@ -79,7 +79,7 @@ export function useApiOld() {
               ...headers,
             },
           });
-        } catch (refreshError) {
+        } catch {
           throw new Error('Authentication failed');
         }
       }
