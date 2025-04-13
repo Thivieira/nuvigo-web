@@ -1,16 +1,26 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
+
+// Extend axios config to include retry properties
+interface AxiosRetryConfig extends AxiosRequestConfig {
+  retry?: number;
+  retryDelay?: number;
+}
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333';
 
 // Create axios instance with default config
-export const axiosInstance = axios.create({
+const config: AxiosRetryConfig = {
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // 10 seconds
+  timeout: 30000, // 30 seconds
   withCredentials: true,
-});
+  retry: 3, // Number of retries
+  retryDelay: 1000, // Delay between retries in milliseconds
+};
+
+export const axiosInstance = axios.create(config);
 
 // Request interceptor for adding auth token
 axiosInstance.interceptors.request.use(
@@ -90,16 +100,18 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const { config } = error;
-    if (!config || !config.retry) {
-      return Promise.reject(error);
+
+    // If the error is a timeout or network error, and we haven't exceeded retries
+    if ((error.code === 'ECONNABORTED' || !error.response) && config.retry > 0) {
+      config.retry -= 1;
+      const delayRetry = new Promise((resolve) => {
+        setTimeout(resolve, config.retryDelay || 1000);
+      });
+
+      await delayRetry;
+      return axiosInstance(config);
     }
 
-    config.retry -= 1;
-    const delayRetry = new Promise((resolve) => {
-      setTimeout(resolve, config.retryDelay || 1000);
-    });
-
-    await delayRetry;
-    return axiosInstance(config);
+    return Promise.reject(error);
   }
 ); 

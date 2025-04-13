@@ -4,8 +4,22 @@ export interface WeatherData {
   condition: string;
   high: string;
   low: string;
+  precipitation: string;
   humidity: string;
   windSpeed: string;
-  precipitation: string;
-  weatherCode: number;
+  weatherCode: string;
+}
+
+export interface WeatherResponse {
+  naturalResponse: string;
+  sessionId: string;
+  weatherData: WeatherData;
+  metadata: {
+    currentTime: string;
+  };
+}
+
+export interface WeatherRequest {
+  location: string;
+  query: string;
 }

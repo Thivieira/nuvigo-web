@@ -123,7 +123,7 @@ export default function DashboardLayout({
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         <header className="bg-white border-b p-4" style={{ height: '65px' }}>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between md:justify-end">
             {/* Mobile Menu Button (Left) */}
             <div className="md:hidden">
               <Sheet>
@@ -145,7 +145,7 @@ export default function DashboardLayout({
             </Link>
 
             {/* Desktop Title */}
-            <h1 className="text-xl font-bold hidden md:block cursor-default">Painel de Controle</h1>
+            {/* <h1 className="text-xl font-bold hidden md:block cursor-default">Painel de Controle</h1> */}
 
             {/* Avatar (Right side - always visible) */}
             <Link href="/dashboard/profile" className="cursor-pointer" title="Atualizar o perfil">

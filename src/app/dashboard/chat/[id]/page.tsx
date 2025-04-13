@@ -48,6 +48,7 @@ export default function ChatSessionPage({ params }: ChatSessionPageProps) {
         <Button
           variant="ghost"
           size="icon"
+          className="cursor-pointer"
           onClick={() => router.back()}
         >
           <ArrowLeft className="h-4 w-4" />

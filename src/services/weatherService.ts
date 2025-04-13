@@ -1,17 +1,5 @@
-import { axiosInstance } from '../lib/axios';
-
-// Weather response type
-export interface WeatherResponse {
-  location: string;
-  temperature: string;
-  condition: string;
-  high: string;
-  low: string;
-  humidity: string;
-  windSpeed: string;
-  precipitation: string;
-  weatherCode: number;
-}
+import { axiosInstance } from '@/lib/axios';
+import { WeatherRequest, WeatherResponse } from '@/types/weather';
 
 // Weather service functions
 export const weatherService = {

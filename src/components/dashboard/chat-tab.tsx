@@ -38,15 +38,17 @@ export default function ChatTab({ activeLocation, weatherData, loading, initialM
       {
         id: Date.now().toString(),
         role: "assistant",
-        content: `Olá! Sou seu assistente meteorológico Nuvigo. Você pode me perguntar sobre o clima em ${activeLocation} ou em qualquer outro local. Como posso ajudar você hoje?`,
+        content: activeLocation
+          ? `Olá! Sou seu assistente meteorológico Nuvigo. Você pode me perguntar sobre o clima em ${activeLocation} ou em qualquer outro local. Como posso ajudar você hoje?`
+          : "Olá! Sou seu assistente meteorológico Nuvigo. Você pode me perguntar sobre o clima em qualquer local. Como posso ajudar você hoje?",
       },
     ],
+    activeLocation
   })
 
   useEffect(() => {
     if (status === 'error') {
       toast({
-        title: "Erro",
         description: "Ocorreu um erro ao processar sua mensagem. Por favor, tente novamente.",
         type: "error"
       })
@@ -63,7 +65,9 @@ export default function ChatTab({ activeLocation, weatherData, loading, initialM
         {
           id: Date.now().toString(),
           role: "assistant",
-          content: `Olá! Sou seu assistente meteorológico Nuvigo. Você pode me perguntar sobre o clima em ${activeLocation} ou em qualquer outro local. Como posso ajudar você hoje?`,
+          content: activeLocation
+            ? `Olá! Sou seu assistente meteorológico Nuvigo. Você pode me perguntar sobre o clima em ${activeLocation} ou em qualquer outro local. Como posso ajudar você hoje?`
+            : "Olá! Sou seu assistente meteorológico Nuvigo. Você pode me perguntar sobre o clima em qualquer local. Como posso ajudar você hoje?",
         },
       ])
     }
@@ -75,7 +79,7 @@ export default function ChatTab({ activeLocation, weatherData, loading, initialM
 
       <Card>
         <CardContent className="p-4">
-          <div className="flex flex-col h-[300px]">
+          <div className="flex flex-col h-[500px]">
             <div className="flex-1 overflow-y-auto mb-4 space-y-4">
               {messages.map((message) => (
                 <div

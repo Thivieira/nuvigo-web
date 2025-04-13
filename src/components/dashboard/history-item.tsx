@@ -23,7 +23,8 @@ export default function HistoryItem({ session, onDelete }: HistoryItemProps) {
           variant="ghost"
           size="icon"
           onClick={() => onDelete(session.id)}
-          className="text-muted-foreground hover:text-destructive"
+          title="Excluir conversa"
+          className="text-muted-foreground hover:text-destructive cursor-pointer"
         >
           <Trash2 className="h-4 w-4" />
         </Button>

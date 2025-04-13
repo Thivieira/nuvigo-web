@@ -35,14 +35,12 @@ export default function HistoryTab() {
       await axiosInstance.delete(`/session/${sessionId}`)
       setSessions(prev => prev.filter(session => session.id !== sessionId))
       toast({
-        title: "Conversa excluída",
-        description: "A conversa foi excluída com sucesso.",
+        description: "Conversa excluída.",
         type: "success"
       })
     } catch (error) {
       console.error('Error deleting session:', error)
       toast({
-        title: "Erro",
         description: "Não foi possível excluir a conversa. Por favor, tente novamente.",
         type: "error"
       })
