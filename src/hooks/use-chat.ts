@@ -61,7 +61,7 @@ export function useChat({
       try {
         const response = await axiosInstance.get('/weather', {
           params: {
-            location: activeLocation || 'Rio de Janeiro',
+            location: activeLocation || undefined,
             query: input
           }
         });

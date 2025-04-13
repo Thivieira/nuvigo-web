@@ -19,7 +19,6 @@ export function useSessionDeletion({ onSuccess }: UseSessionDeletionOptions = {}
       await mutateSessions();
 
       toast({
-        title: 'Sucesso',
         description: 'Conversa excluída com sucesso',
         type: 'success'
       });
@@ -28,7 +27,6 @@ export function useSessionDeletion({ onSuccess }: UseSessionDeletionOptions = {}
     } catch (error) {
       console.error('Error deleting session:', error);
       toast({
-        title: 'Erro',
         description: 'Falha ao excluir a conversa',
         type: 'error'
       });

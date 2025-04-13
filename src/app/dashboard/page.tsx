@@ -17,8 +17,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (error) {
       toast({
-        title: "Erro ao carregar dados do clima",
-        description: error,
+        description: `Erro ao carregar dados do clima: ${error}`,
         type: "error"
       })
     }
@@ -37,8 +36,10 @@ export default function Dashboard() {
         precipitation: data.precipitation,
         weatherCode: data.weatherCode,
       })
+    } else if (!activeLocation) {
+      setWeatherData(null)
     }
-  }, [data])
+  }, [data, activeLocation])
 
   return (
     <DashboardTabs
