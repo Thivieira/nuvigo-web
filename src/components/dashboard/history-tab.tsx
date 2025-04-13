@@ -2,13 +2,17 @@ import { Card, CardContent } from "@/components/ui/card"
 import HistoryItem from "./history-item"
 import { useEffect, useState } from "react"
 import { mockChatSessions, type ChatSession } from "@/mocks/chat-history"
-import { useToast } from "@/hooks/use-toast"
+import { useSessionDeletion } from "@/hooks/useSessionDeletion"
 import { axiosInstance } from "@/lib/axios"
 
 export default function HistoryTab() {
   const [sessions, setSessions] = useState<ChatSession[]>([])
   const [loading, setLoading] = useState(true)
-  const { toast } = useToast()
+  const { deleteSession } = useSessionDeletion({
+    onSuccess: () => {
+      // The success toast is handled by the hook
+    }
+  })
 
   const fetchSessions = async () => {
     try {
@@ -31,20 +35,8 @@ export default function HistoryTab() {
   }, [])
 
   const handleDelete = async (sessionId: string) => {
-    try {
-      await axiosInstance.delete(`/session/${sessionId}`)
-      setSessions(prev => prev.filter(session => session.id !== sessionId))
-      toast({
-        description: "Conversa excluída.",
-        type: "success"
-      })
-    } catch (error) {
-      console.error('Error deleting session:', error)
-      toast({
-        description: "Não foi possível excluir a conversa. Por favor, tente novamente.",
-        type: "error"
-      })
-    }
+    await deleteSession(sessionId)
+    setSessions(prev => prev.filter(session => session.id !== sessionId))
   }
 
   if (loading) {

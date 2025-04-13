@@ -2,11 +2,12 @@
 
 import ChatTab from "@/components/dashboard/chat-tab"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Trash } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { ChatSkeleton } from "@/components/dashboard/chat-skeleton"
 import { useChatSession } from "@/hooks/useChat"
 import { use } from "react"
+import { useSessionDeletion } from "@/hooks/useSessionDeletion"
 
 interface ChatSessionPageProps {
   params: Promise<{
@@ -19,6 +20,11 @@ export default function ChatSessionPage({ params }: ChatSessionPageProps) {
   const { id } = use(params)
 
   const { data: session, isLoading } = useChatSession(id)
+  const { deleteSession } = useSessionDeletion({
+    onSuccess: () => {
+      router.back()
+    }
+  })
 
   if (isLoading) {
     return (
@@ -32,6 +38,7 @@ export default function ChatSessionPage({ params }: ChatSessionPageProps) {
     return null
   }
 
+
   // Get the location from the first chat message
   const location = session.chats[0]?.location || ''
 
@@ -44,16 +51,26 @@ export default function ChatSessionPage({ params }: ChatSessionPageProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2">
         <Button
           variant="ghost"
           size="icon"
           className="cursor-pointer"
+          title="Voltar"
           onClick={() => router.back()}
         >
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <h1 className="text-2xl font-bold">{session.title}</h1>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="cursor-pointer"
+          title="Excluir conversa"
+          onClick={() => deleteSession(id)}
+        >
+          <Trash className="h-4 w-4" />
+        </Button>
       </div>
       <ChatTab
         activeLocation={location}
