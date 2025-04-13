@@ -17,6 +17,7 @@ export interface UseChatOptions {
   onResponse?: (response: AxiosResponse) => void;
   onFinish?: (message: Message) => void;
   onError?: (error: Error) => void;
+  activeLocation?: string;
 }
 
 export type ChatStatus = 'idle' | 'submitted' | 'streaming' | 'error';
@@ -28,6 +29,7 @@ export function useChat({
   onResponse,
   onFinish,
   onError,
+  activeLocation,
 }: UseChatOptions = {}) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState('');
@@ -57,54 +59,26 @@ export function useChat({
       setStatus('submitted');
 
       try {
-
-
-        const response = await axiosInstance.post(api, {
-          chatSessionId: id,
-          message: input,
-          role: 'user',
-          turn: messages.length,
-          metadata: {}
+        const response = await axiosInstance.get('/weather', {
+          params: {
+            location: activeLocation || 'Rio de Janeiro',
+            query: input
+          }
         });
 
         if (onResponse) {
           onResponse(response);
         }
 
-        setStatus('streaming');
+        const { naturalResponse } = response.data;
 
-        // Handle streaming response
-        const reader = response.data.getReader();
-        if (!reader) {
-          throw new Error('No reader available');
-        }
-
-        const decoder = new TextDecoder();
         const assistantMessage: Message = {
           id: Date.now().toString(),
           role: 'assistant',
-          content: '',
+          content: naturalResponse,
         };
 
         setMessages((prev) => [...prev, assistantMessage]);
-
-        while (true) {
-          const { done, value } = await reader.read();
-
-          if (done) {
-            break;
-          }
-
-          const chunk = decoder.decode(value, { stream: true });
-          assistantMessage.content += chunk;
-
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === assistantMessage.id ? { ...assistantMessage } : msg
-            )
-          );
-        }
-
         setStatus('idle');
 
         if (onFinish) {
@@ -126,7 +100,7 @@ export function useChat({
         abortControllerRef.current = null;
       }
     },
-    [api, id, input, messages, onError, onFinish, onResponse, status]
+    [input, status, activeLocation, onResponse, onFinish, onError]
   );
 
   // Cleanup on unmount
