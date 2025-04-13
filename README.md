@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nuvigo Web
 
-## Getting Started
+Nuvigo é um assistente de clima/tempo inteligente que fornece previsões meteorológicas precisas e personalizadas. Esta interface web, desenvolvida com Next.js, permite aos usuários interagir de forma intuitiva com o sistema, visualizando dados meteorológicos em tempo real e previsões futuras.
 
-First, run the development server:
+## 🚀 Começando
+
+Primeiro, instale as dependências do projeto:
+
+```bash
+npm install
+# ou
+yarn install
+# ou
+pnpm install
+```
+
+Em seguida, inicie o servidor de desenvolvimento:
 
 ```bash
 npm run dev
-# or
+# ou
 yarn dev
-# or
+# ou
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra [http://localhost:3000](http://localhost:3000) no seu navegador para ver o resultado.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Você pode começar a editar a página modificando `app/page.tsx`. A página será atualizada automaticamente conforme você edita o arquivo.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Tecnologias Utilizadas
 
-## Learn More
+- [Next.js](https://nextjs.org) - Framework React para produção
+- [TypeScript](https://www.typescriptlang.org) - Superset JavaScript com tipagem estática
+- [Tailwind CSS](https://tailwindcss.com) - Framework CSS utilitário
+- [SWR](https://swr.vercel.app) - Biblioteca de gerenciamento de estado e cache
+- [Jest](https://jestjs.io) - Framework de testes
 
-To learn more about Next.js, take a look at the following resources:
+## 🎯 Objetivos do Projeto
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+O Nuvigo Web tem como objetivo principal fornecer uma interface moderna e intuitiva para os usuários do assistente de clima/tempo Nuvigo, garantindo:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Acesso rápido e preciso a informações meteorológicas
+- Experiência de usuário fluida e agradável
+- Integração eficiente com a API backend
+- Performance excepcional em todos os dispositivos
+- Segurança e privacidade dos dados
+- Escalabilidade para crescimento futuro
+- Manutenibilidade do código
 
-## Deploy on Vercel
+## 📚 Recursos
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [Documentação do Next.js](https://nextjs.org/docs) - Aprenda sobre os recursos e API do Next.js
+- [Aprenda Next.js](https://nextjs.org/learn) - Tutorial interativo do Next.js
+- [Repositório GitHub do Next.js](https://github.com/vercel/next.js) - Contribuições são bem-vindas!
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🚀 Deploy
+
+A maneira mais fácil de fazer deploy da sua aplicação Next.js é usando a [Plataforma Vercel](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) dos criadores do Next.js.
+
+Confira nossa [documentação de deploy do Next.js](https://nextjs.org/docs/app/building-your-application/deploying) para mais detalhes.
+
+## 📝 Estrutura do Projeto
+
+```
+nuvigo-web/
+├── app/                # Diretório principal da aplicação
+│   ├── page.tsx        # Página inicial
+│   └── layout.tsx      # Layout principal
+├── public/             # Arquivos estáticos
+├── styles/             # Estilos globais
+└── package.json        # Dependências e scripts
+```
+
+## 🤝 Contribuindo
+
+Contribuições são sempre bem-vindas! Por favor, leia o [guia de contribuição](CONTRIBUTING.md) para mais detalhes.
+
+## 📄 Licença
+
+Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
+
+## 🐳 Executando com Docker
+
+O projeto pode ser executado facilmente usando Docker. Siga os passos abaixo:
+
+1. **Construa a imagem Docker**:
+```bash
+docker build -t nuvigo-web .
+```
+
+2. **Execute o container**:
+```bash
+docker run -p 3000:3000 nuvigo-web
+```
+
+3. **Para desenvolvimento com hot-reload**:
+```bash
+docker run -p 3000:3000 -v $(pwd):/app nuvigo-web npm run dev
+```
+
+4. **Para produção**:
+```bash
+docker run -p 3000:3000 -e NODE_ENV=production nuvigo-web npm start
+```
+
+### Variáveis de Ambiente
+
+Certifique-se de configurar as seguintes variáveis de ambiente no seu arquivo `.env`:
+
+```env
+NEXT_PUBLIC_API_URL=http://seu-backend-url
+# Outras variáveis de ambiente necessárias
+```
