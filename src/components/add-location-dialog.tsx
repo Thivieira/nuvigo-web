@@ -2,8 +2,6 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
   Dialog,
   DialogContent,
@@ -13,9 +11,10 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import { Plus, MapPin, Loader2 } from "lucide-react"
+import { Plus, Loader2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
+import LocationSelect from "./location-select"
 
 interface AddLocationDialogProps {
   onAddLocation: (location: string) => Promise<void>
@@ -70,20 +69,13 @@ export default function AddLocationDialog({ onAddLocation }: AddLocationDialogPr
               </Alert>
             )}
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="location" className="text-right">
-                Localização
-              </Label>
-              <div className="col-span-3 flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="location"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Digite o nome da cidade"
-                  className="col-span-3"
-                  disabled={isLoading}
-                />
-              </div>
+              <LocationSelect
+                value={location}
+                onChange={setLocation}
+                placeholder="Digite o nome da cidade"
+                disabled={isLoading}
+                className="col-span-4"
+              />
             </div>
           </div>
           <DialogFooter>
